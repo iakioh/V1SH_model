@@ -1,0 +1,299 @@
+%---------------------------------------------------------------------------------
+% Table of content
+%---------------------------------------------------------------------------------
+
+\newpage % Generates page break
+
+% Table of content
+\thispagestyle{empty} % Suppresses page numbers
+\tableofcontents % Adds table of content
+\newpage % Generates page break
+
+% List of figures
+%\thispagestyle{empty} % Suppresses page numbers
+%\listoffigures % Adds list of figures; uncomment if required
+%\newpage % Generates page break; uncomment if required
+
+% List of tables
+%\thispagestyle{empty} % Suppresses page numbers
+%\listoftables % Adds list of tables; uncomment if required
+%\newpage % Generates page break; uncomment if required
+
+Topic: A V1 Neural Circuit Model for the V1 Saliency Hypothesis
+
+% every claim that is beyond textbook knowledge needs to be referenced 
+% Ideally, 6-10 references should be given. Points subtracted if citation style is inconsistent 
+% Be warry of citing reviews. Usually best to cite the original work directly (but of course reviews are  excellent sources of information for your essay)
+
+% Maybe: Abstract
+
+% Introduction: 
+% - theory, models and data
+
+% - inaccurate V1 model, and its relation to the V1SH theory
+%     "an intermediary between a theoretical hypothesis  and experimental data. This role can be ful lled, for example, by demonstrating the theory in particular  instances or by tting data to a particular manifestation of the theory. In our current example, the theory is the  V1 saliency hypothesis, the data are observations of bottom-up visual selection, and the V1 model played a role  of verifying the theory by testing the ability of a restricted set of V1 mechanisms to account for some  behavioral observations" \cite{zhaoping_understanding_2014}
+    
+%     - Data: Physiological and psychological observations = V1 data, saliency data -> inspire and test theory
+%     - Theory: Hypotheses and principles = V1SH -> predict \& explain data
+%     - Model: characterizing mechanisms and phenomena = The V1 model -> demonstrate \& implement theory, fit to data, help to predict and explain theory
+
+% - Data:
+%     - Directing attention behaviorally: Top- vs. bottom up attention
+%         We can direct attention both by shifting our gaze to the location of selection ("overtly") or without shifting our gaze to the location of selection ("covertly"). But since overt selection is more effective, it dominates during natural visual behavior. Attention can be directed in a task-driven, goal dependent, so called top-down manner, or a stimulus-driven, goal independent, so called bottom-up manner. 
+        
+%         This way, compared to top-down attention, bottom-up attention has been found to be faster but last shorter. Bottom-up attention is more effective, e.g.\ bottom-up interferes with a task, overwrites previous top-down attention cues and is hard to ignore even if the cueing signals are invalid. Furthermore, bottom-up attention can help in a task even if the location is already known. 
+
+%     - how to measure attention: 
+%         One can distinguish top-down and bottom-up attention experimentally by comparing the effect of stimulus-driven (e.g.\ flashing a location outside of the gaze to attend) and goal-driven (e.g.\ pointing out a direction to shift your gaze at the location of the gaze) cueing signals for a subsequent task ("cuing effect"). Since selection gates decoding, attention influences task performance and can be measured by comparing accuracy and reaction time between validly and non-validly cued trials (i.e.\ when the cue indicated the location of the target correctly vs.\ incorrectly). 
+
+%         "empirical selection approaches selection by saliency only in the asymptotic limit at  which top-down factors are eliminated. This asymptotic limit is an ideal, which is dif cult to reach  experimentally. [...] when the topdown factors that in uence selection are made equal. Furthermore, we can minimize top-down  contributions to selection by minimizing expectation, knowledge, or awareness of the visual inputs, and  we can also shorten input viewing duration to avoid visual knowledge being triggered or having time to  exert its top-down effects on selection." \cite{zhaoping_understanding_2014}
+            
+%     - definition of saliency: 
+%         Saliency of a location (or stimulus) is the degree the location (or stimulus' location) attracts attention in a bottom-up manner. Given a visual scene, the brain is thought to compute the salience of every location, a saliency map, and then selects the most salient location for decoding and as target of gaze.
+
+%         "The basis of verifying whether a computational de nition of saliency captures the reality should be our  operational de nition of saliency as the degree in which a visual location attracts attention by bottom-up  mechanisms. This operational de nition of saliency should also offer a basis to test any theory about saliency." \cite{zhaoping_understanding_2014}
+
+%         "The saliency of a location increases with the probability with which this location is selected bottom-up  before the other locations in the scene. It is inversely related, either deterministically or stochastically, to  the order in which this location is selected by bottom-up manner mechanisms in the scene." \cite{zhaoping_understanding_2014}
+
+% - Theory: Briefly summarized V1SH -> Directing attention neurally
+
+%     In contrary, the V1 Saliency Hypothesis (V1SH) proposes that the firing rate responses of neurons in V1 make up the saliency map, with a winner-take-it-all readout to the SC such that the location of the receptive field of the V1 neuron with highest firing rate is selected by bottom-up attention. Instead of abstracting features by summing specific feature maps, V1SH proposes to abstract features by comparing the universal currency of all neurons - their firing rate - blindly of a neuron's feature tuning. A central neural substrate of such saliency computation are the inhibitory interaction between V1 neurons tuned to similar features, which can cause iso-feature supression and additionally motivates the function of contextual influences unexplained in the classical view on receptive fields. 
+
+%     "first, the saliency of a location is represented by the highest of the responses of the V1  neurons whose receptive elds cover that location; and second, the receptive eld location of the most active V1  cell in response to a visual scene is the most salient location in the scene." \cite{zhaoping_understanding_2014}
+
+%     Attention and information bottleneck: Visual selection by attention gates visual decoding and thus is essential to understand vision. Of the original $\sim 10^7$ bits of information transfered per second through the optic tract, humans can only recognize and act upon maximally $\sim 40$ bits of information. This information bottleneck means we are blind to most of our visual field, which might go against our impression because we don't know what we don't see.
+
+%     „This does not mean that the selectivities of the V1 neurons to features are useless for visual computation beyond saliency. For instance, these selectivities can be used for decoding visual inputs in a visual area downstream along the visual pathway. However, whether or not they are used as part of other computations should not be relevant for saliency signaling (Li, 2002).“  
+
+% - Model: Goals of V1 Model
+%     The V1 circuit model uses only plausible V1 mechanisms and V1-like elements and thus allows to test if and how neural circuits in V1 could plausibly compute a saliency map. 
+
+%     "It is possible to build a V1 model which can simultaneously satisfy two requirements: (1) reproducing the  contextual in uences that are observed physiologically; and (2) being able to amplify selective deviations  from homogeneity in the input, without hallucinating heterogeneous responses to homogenous visual  inputs. Therefore, V1 mechanisms are plausible neural substrates for saliency." \cite{zhaoping_understanding_2014}
+
+%     "Under the V1 saliency hypothesis, the responses of the V1 model to representative visual inputs produce  saliency maps that are consistent with subjective visual experience and previous behavioral  observations." \cite{zhaoping_understanding_2014}
+
+%     "that iso-orientation suppression is the dominant mechanism  underlying various saliency effects + other intracortical interactions, including colinear facilitation and general, feature-unspec c,  contextual suppression, also play essential roles in shaping saliency; especially for more complex inputs" \cite{zhaoping_understanding_2014}
+
+%     „can signal saliency at locations of complex shapes such as ellipses and crosses, even though there is no V1 cell tuned to such shapes“ 
+
+%     „Saliency mechanisms have side effects, and these can be understood.“ \cite{zhaoping_understanding_2014}
+
+% Formulation of the V1 Model:
+
+% - make all assumptions / ambiguities / focus explicit:
+%      „The appropriate complexity of a cortical circuit model depends on the question asked.“ „We have limited intuitions of the neural circuit models of more than two interacting neurons, except of those with special properties such as translation symmetry.“ „find a minimal model which has all the necessary complexity, but no more, to address the problem of interest, whether to test the feasibility of a hypothesized behavioral role or to understand the mechanisms underlying neural responses.“ „should also be first understood at the level of their simpler components, a single E–I pair or a hypercolumn of them.“ \cite{zhaoping_neural_2011}
+    
+%     - orientation and spatial location feature only 
+%     - same RF sizes 
+%     - center sit on regular spatial grid (-> e.g. no cortical magnification)
+%         For simplicity, the model focuses on orientation features only (which allows for the most complex cases) and just one spatial scale, such that all receptive fields are of the same size. Then the integer $i$ indexes the location or equivalently hypercolumn, and $\theta$ denotes the prefered orientation (in degree) of a neuron, with resolution $\Delta \theta$. 
+
+%         "(1) that the model contains only neurons tuned to spatial  locations and orientations; (2) that the model ignores many physiological details; and, (3) that all the model  neurons have the same receptive eld size. These restrictions imply that the model can only be tested against a restricted set of saliency data. For example, the model is not expected to account well for the saliency of a scale  singleton because it omits the multiscale property of V1. Nevertheless, we can ask whether the V1 model can be  successful when applied to an appropriately restricted set of data." \cite{zhaoping_understanding_2014}
+    
+%         „focuses on only two features, spatial location and orientation“ ([Zhaoping, 2014, p. 30](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=30&annotation=37V2DPRH))
+
+%         „each model neuron is characterized by its preferred orientation and spatial location; all model receptive elds have the same size; and the centers of the receptive elds sit on a regular spatial grid.“ ([Zhaoping, 2014, p. 30](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=30&annotation=V3H8NAWF))
+
+%     - many neurophysiological details abstracted
+%         „focuses on the role of intracortical interactions in computing saliency, the model mainly includes orientation selective neurons in layers 2–3 of V1“ \cite{zhaoping_understanding_2014}
+     
+%          - no cell type specified: "include all cells in this area or just a subpopulation. Certainly, it is unlikely  that these cells include the inhibitory interneurons in V1. However, “the V1 cells” should cover the whole visual  eld. For simplicity, in this book, we will not distinguish between a putative subpopulation and the other V1  cells." \cite{zhaoping_understanding_2014}
+
+%         - no mechanistic model of RF generation: „ignores the mechanism by which the neural receptive elds are generated“ „seen through the model classical receptive elds (CRFs) of V1 complex cells“ ([Zhaoping, 2014, p. 30](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=30&annotation=KQZJPFZM)) i.e. Gabor Filter?
+
+%      - translation invariant connections -> simpler model for analysis and calibration, and neurophysiologically motivated by other models using it to explain psychophysisc and on a broad population-bases circuit level: 
+%         "we  assume that the properties of V1 CRFs and intracortical interactions are translation invariant. This implies that  the input tunings and stimulus-bound responses to inputs within a neuron’s CRF do not depend on the  location of that CRF and that the interaction between two neurons depends only on the relative, but not the  absolute, locations of their CRFs." \cite{zhaoping_understanding_2014}
+
+%         „a translation invariant structure, such that all neurons of the same type have the same properties, and the neural connections (or ) have the same structure from all the presynaptic neurons except for translation and rotation to suit the position and orientation of the presynaptic receptive eld (Bressloff Cowan Golubitsky Thomas and Wiener, 2002)“ ([Zhaoping, 2014, p. 33](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=33&annotation=NQTU88LI))
+
+%         -> allows without boundary, at least in practice for simulation: „the actual spatial extent of the input and response patterns should be understood to extend spatially well beyond the boundaries of the plotted regions. The model has a periodic or wrap-around boundary condition to simulate an infinitely large visual space; this is a conventional idealization of reality“ ([Zhaoping, 2014, p. 35](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=35&annotation=GJJ9AZ84)) „model is always simulated in a two-dimensional visual space in a wrap-around or periodic boundary condition“ ([Zhaoping, 2014, p. 37](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=37&annotation=S84LF3JW)) „Nx and Ny are much larger than the maximum length of the lateral connections and .“ ([Zhaoping, 2014, p. 37](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=37&annotation=KXQT3JWX))
+
+% - explain all parts, why needed, and TODO: neuroscientific basis
+
+%         - compare to other models -> interacting hypercolumn model; rate-based population model
+%             „Therefore, a 1:1 ratio between the numbers of pyramidal cells and interneurons in the model does not imply such a ratio in the cortex.“ ([Zhaoping, 2014, p. 31](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=31&annotation=KGKDRVUJ))
+
+%             „may be categorized into three levels of complexity, giving model classes referred to as reduced columnar models, hypercolumn models, and interacting hypercolumn models.“
+%                 „The reduced columnar models [13 ]) have all neurons sharing the same receptive field position and preferred feature“ „each modeling a local group of similar cortical cells“
+                
+%                 „The hypercolumn models contain interacting neurons tuned to different feature values in a single feature dimension“ ([Zhaoping, 2011, p. 808](zotero://select/library/items/7UNWKG9W)) ([pdf](zotero://open-pdf/library/items/SYSER657?page=1&annotation=MNFIC38X)) „The interacting hypercolumn models contain neurons tuned to both space (by their receptive field locations) and another feature such as orientation, color, motion direction, or depth (or even combinations of them)“ ([Zhaoping, 2011, p. 808](zotero://select/library/items/7UNWKG9W)) ([pdf](zotero://open-
+%             pdf/library/items/SYSER657?page=1&annotation=REF4PEQ7)) 
+        
+%         As known from V1, the model consists of excitatory pyramidal cells and inhibitory inter-neurons. Pyramidal cells are the output and visual input, the latter denoted as $I_{i \theta}$, of V1. 
+        
+%         A pyramidal cell at location $i$ tuned to orientation $\theta$ deviates by $x_{i\theta}$ from its resting potential, with a firing rate $g_x(x_{i\theta})$ obtained by a piece-wise linear, but for too low and to high values thresholded activation function $g_x$. There are excitatory monosynaptic connections between pyramidal cells of different hypercolumns $J_{i\theta, j\theta'}$ (for $i \neq j$) and self-excitation $J_o$. The connections are of finite range, and structured such that neurons tuned to bars which could lie on a smooth contour are more likely to excite each other - the basis of co-linear activation. 
+        
+%             „sigmoid-like functions“ ([Zhaoping, 2014, p. 32](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=32&annotation=JLP8RT44))
+
+%             „model the decay to resting potentials“ ([Zhaoping, 2014, p. 32](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=32&annotation=QAD3JXZ9))
+        
+%         The firing rate of the interneurons, here one for each pyramidal cell, is $g_y(y_{i\theta})$ for a state $y_{i\theta}$ and similar activation function $g_y$ as for pyramidal cells, but with increasing slope for increasing $y_{i\theta}$. Interneurons project inhibitorily and more locally. Firstly, they inhibit and in return are excited by the corresponding pyramidal cells. Secondly, interneurons of different but closeby hypercolumns and tuned to similar orientation connect $W_{i\theta, j\theta'}$ (for $i \neq j$), which leads to disynaptic inhibition between pyramidal cells - the basis for iso-orientation supression. Lastly, pyramidal cells  are supressed  by similarly (as quantified by a function $\psi$) tuned interneurons within the same hypercolumn. 
+            
+%         In total
+%         \begin{align}
+%             \dot x_{i\theta} &= - \alpha_x  x_{i\theta} - g_y(y_{i\theta}) + \sum_{j\neq i, \theta'} J_{i\theta, j\theta'} g_x(x_{j\theta'}) + J_o g_x(x_{i\theta}) - \sum_{\theta' \neq \theta} \psi(|\theta - \theta'|) g_y(y_{i\theta'}) + I_{i\theta} + I_o + I_{noise} \\
+%             \dot y_{i\theta} &= -\alpha_y y_{i\theta} + g_x(x_{i\theta}) + \sum_{j\neq i, \theta'} W_{i\theta, j\theta'} g_x(x_{j\theta'}) + I_c + I_{noise}
+%         \end{align}
+%         with membrane time constants $\alpha_x, \alpha_y$, activity normalization terms $I_o, I_c$ and noise term $I_{noise}$. 
+
+%         „background inputs modeling the general and local normalization of activities“ ([Zhaoping, 2014, p. 32](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=32&annotation=ET8MYXHI))
+
+%         „input noise which is independent between different neurons“ ([Zhaoping, 2014, p. 32](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=32&annotation=SNRT8KMX))
+
+%         Input: 5.10
+%         „contains a bar of contrast at location i and oriented at angle ,“ ([Zhaoping, 2014, p. 33](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=33&annotation=P69NCUZ5))
+
+%         add meaning of each term below
+
+%        $\theta$ 12 angles in equal step clockwise from vertical
+
+%         Figure of weights, circuit and model layers: „Figure 5.15 B shows the structure of the lateral connections in the model (Li, 1999b)“ ([Zhaoping, 2014, p. 33](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=33&annotation=YZ75EZJ7))
+
+%         Figure of activation functions
+
+%         „it will be argued that equations (5.8) and (5.9) give a minimal model for V1’s saliency computation“ ([Zhaoping, 2014, p. 35](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=35&annotation=73UZDHC3))
+
+% - explain / give intuition for model behavior \& dynamics through simple example
+%     The V1 model responses are dynamic, e.g.\ for $\alpha_x = \alpha_y$ first the visual input is integrated by the pyramidal cells and pyramidal cells excite each other through monosynaptic pyramidal connections, afterwards the delayed because disynaptic inhibition supresses the pyramidal cells' responses. This again weakens excitation and thus disynaptic inhibition, leading to a rebound effect and oscillations as known from V1. 
+
+%     „Model behavior,“ ([Zhaoping, 2014, p. 40](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=40&annotation=5R9ZFY73))
+
+%     "Thus, even though the CRFs are small and the intracortical connections that mediate contextual  influences have a finite range, this mechanism allows V1 to perform a global computation such that its  neural responses re ect context beyond the range of the intracortical connections" \cite{zhaoping_understanding_2014} 
+
+%     The V1 model confirms the intuition that iso-orientation suppression is a leading mechanism underlying various saliency effects in spatial input patterns (textures)
+
+% - saliency measure
+%     V1SH then proposes that the bid for bottom-up selection at location $i$ is $$B_i = \max_{\theta}[g_x(x_{i\theta})].$$ One averages responses over time and uses the Z-score $z_i = \frac{B_i - \overline B}{\sigma_B}$ over location $i$ to obtain a predicted saliency value for each location $i$. After calibration, the V1 model with fixed parameters can be tested by comparing predicted saliency values with with saliency measurements to also more complex visual input. 
+
+%     "This inconsistency  however merely defines the spatial resolution of the saliency map. For the main functional role of saliency,  which is to specify how attention should shift using saccades (Hoffman, 1998), this resolution, as defined by the sizes of the V1 receptive elds, is adequate." \cite{zhaoping_understanding_2014} 
+
+%     "distinguish a brain area that contains the saliency map SMAP(x) from the brain areas that read out the saliency  map for the purpose of shifting attention. V1’s saliency output may be read by (at least) the superior colliculus  (SC) (Tehovnik Slocum and Schiller, 2003), which receives inputs from V1 and directs gaze (and thus attention)" \cite{zhaoping_understanding_2014} 
+
+%     "If the local competition is performed in V1, and if the global competition is  done in a read-out area such as the SC, then the explicit saliency map SMAP(x) should be found in the activities  of the neurons projecting to the SC. This would license just a numerically small number of projecting neural  bers from V1 to the SC, consistent with anatomical ndings (Finlay Schiller and Volman, 1976)." \cite{zhaoping_understanding_2014} 
+
+%     "V1SH is agnostic as to where and how the maximum operations are performed; these  questions can be investigated separately."  \cite{zhaoping_understanding_2014} 
+
+%     "For saliency, the maximum operation is only needed en route (perhaps in the layer 5  of V1) to, or in, the saliency read-out area. This need not distort the O values projecting to other brain areas." \cite{zhaoping_understanding_2014} 
+
+%     „5.4.4.2 Assessing saliency from model V1 responses: illustrated by the effect of the orientation contrast at a texture border“ ([Zhaoping, 2014, p. 43](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=43&annotation=ABI37SAN))
+    
+
+% Calibration of the V1 Model:
+
+%     „High complexity of such models makes them very difficult to harness. Therefore, in order to properly investigate the cortical roles, it is essential that the models are designed to have its responses resemble the physiological responses, particularly the responses under contextual influences which are sensitive to network interactions [27,29–31].“ ([Zhaoping, 2011, p. 812](zotero://select/library/items/7UNWKG9W)) ([pdf](zotero://open-pdf/library/items/SYSER657?page=5&annotation=LIC2IYHF))
+
+%     „we need to ensure that the relevant behaviors of the model resemble those of real V1 as much as possible“ ([Zhaoping, 2014, p. 35](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=35&annotation=BPL29TUW)) „just like calibrating an experimental instrument in order to be able to trust subsequent measurements taken with this instrument“ ([Zhaoping, 2014, p. 35](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=35&annotation=RKPN8VUV)) „qualitatively resemble the real V1 responses“ ([Zhaoping, 2014, p. 35](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=35&annotation=JIQC8JBZ))
+
+%     To ensure the V1 model is well-behaved and resembles real V1 responses for physiologically tested inputs, its parameters are calibrated to show qualitatively correct behavior to simple visual inputs, including context dependent supression for high contrast inputs and context dependent colinear enhancement for low contrast input. Especially this ensures spatial homogeneous output for spatial homogeneous input (no "hallucinations"). 
+
+%     The V1 model (using plausible V1 elements) achieves simultaneously
+%         A: reproducing the contextual influences observed physiologically in real V1 -> „We simulate V1 model responses to these inputs, and compare the average ring rates of model and real V1 units to assess the qualitative resemblance“ ([Zhaoping, 2014, p. 35](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=35&annotation=TBZAFQ57)) „As in physiological data, stronger and weaker input contrast are associated with stronger suppression and facilitation, respectively“ ([Zhaoping, 2014, p. 37](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=37&annotation=I7CBS7VW))
+        
+%         B: being able to amplify selective deviations from homogeneity in visual inputs, without hallucinations
+%         „t when the input is not translation invariant, and if the location where the input changes is conspicuous, the model should give relatively higher responses to this location.“ „when the model is exposed to an homogenous texture, the population response should also be homogenous. In particular, this means that if inputs to the model are independent of the spatial location i, then the outputs should also be (neglecting the response noise, which should be such that they do not cause qualitative differences)“ „translation invariant dynamical systems are subject to spontaneous symmetry breaking, and so they could generate non-homogenous responses even when fed with homogenous inputs.“ „there is a con ict between the need to have strong iso-orientation suppression to highlight conspicuous input locations, e.g., at a texture border or a feature singleton, and the need to have a weak iso-orientation suppression in order to prevent spontaneous symmetry breaking to homogenous inputs.“ „resolving this con ict imposes the following requirement on the model’s neural circuit: mutual suppression between principal neurons should be mediated disynaptically by inhibitory interneurons, as in the real V1“ „the colinear facilitation implied by Fig. 5.18 FGH should not be so strong as to activate a neuron whose most preferred stimulus bar is absent in the input but is an extrapolation of a straight line present in the input image“ „Nevertheless, a single set of model parameters (presented in the appendix to this chapter; see Section 5.9) has been found that satis es both sets of requirements, reinforcing the plausibility of the hypothesis that V1 creates a bottom-up saliency map.“ ([Zhaoping, 2014, p. 39](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=39&annotation=HZM95MLJ)) -> „in order to achieve sensitive amplification of conspicuous input elements relative to other inputs without sensory hallucinations, it is necessary to model the cortical circuit as an E–I network“ \cite{zhaoping_neural_2011} "The intracortical connections in the model are designed so that the sum of the disynaptic inhibition overwhelms the sum of the monosynaptic excitation in an iso-orientation texture. Hence, the net contextual in uence on any bar in an iso-oriented and homogenous texture will be suppressive—this is isoorientation suppression.“ ([Zhaoping, 2014, p. 34](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=34&annotation=T7E22FYD))
+
+%     „readers interested in the nonlinear neural dynamics (Li 1999b, Li 2001, Li and Dayan 1999).“ ([Zhaoping, 2014, p. 39](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=39&annotation=I9SH399T))
+
+
+% Tests and Predictions of the V1 Model:
+
+% The V1 model's saliency behavior (by V1SH) is consistent with visual saliency behavior. 
+%     „The model showed that, even in images (like those used in many visual search studies) where saliency differences between input items are subtler, the model responses to more salient locations are consistently higher than its responses to less salient locations. These findings inspired the hypothesis that V1 computes saliency from its inputs via its intracortical mechanisms, such that the most salient location in the visual field to guide attention in a bottom-up or goal independent manner is the receptive field location of the V1 cell most activated by the visual scene [42 ,43,44 ]“ \cite{zhaoping_neural_2011}
+
+% % - maybe visualization if plots included:
+% %     „the widths of the bars plotted in each gure are made to be larger for stronger input strength , or greater pyramidal responses (or their temporal averages)“ ([Zhaoping, 2014, p. 33](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=33&annotation=D3PVZJZ7))
+
+% %     „only show bars whose output responses exceed a threshold“ ([Zhaoping, 2014, p. 37](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=37&annotation=WKW3HSRX)) Is there a general rule how to plot it, or just try to find one good on for each plot?
+
+% %     „model input plots are typically plotted according to the values of (i.e., the actual input image)“ ([Zhaoping, 2014, p. 37](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=37&annotation=TBNYF6ST))
+
+% - Effect of background regularity (B)
+
+%     „5.4.4.5 The ease of a visual search decreases with increasing background variability“ ([Zhaoping, 2014, p. 48](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=48&annotation=KCMWRDIY))
+    
+% - Effect of texture element density (B)
+%     We learned that denser background (e.g.\ more regularily or closeby spaced) leads to higher saliency of orientation singleton since iso-orientation supression is mediated by the \textit{local} disynaptic inhibitory connections. 
+
+%     „aliency by feature contrast decreases with a decreasing density of input items“ ([Zhaoping, 2014, p. 49](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=49&annotation=3CFEP9QE))
+
+% - Effect of Contrast and border in input texture (B)
+
+% - Feature vs conjunction search (A)
+
+%     „Feature search and conjunction search by the V1 model“ ([Zhaoping, 2014, p. 46](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=46&annotation=F3NSHVCU))
+
+% - How a hole attracts attention (B)
+%     Also, maximal saliency values to close enough neighbors of the visual feature attracting attention is all you need, e.g.\ for effectively salient holes. 
+
+%     „How does a hole in a texture attract attention?“ ([Zhaoping, 2014, p. 51](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=51&annotation=6ERINVA3))
+
+% - Complex shapes, Face (B)
+%     And this also allows to signal saliency at locations of more complex shapes such as ellipses, circles, and crosses.
+
+%     The V1 model can signal saliency at locations of complex shapes such as ellipses, circles, and crosses.
+
+% - Visual Search Asymmetry (A)
+%     A feature, for which a feature singleton (an item with an unique feature value) can be efficiently searched is defined as a basic feature, i.e.\ which can be found within a time (nearly) independent of the number of surrounding items (with equal feature values sufficiently distinct from the feature singleton). Basic features include orientation, motion direction and color. 
+
+%     In tests of visual search asymmetry, one compares the model's Z-score to two visual inputs with behavioral experiments on the comparative easiness of the visual search. While each correct prediction on it's own has a $50\%$ probability to be by chance, $n$ correctly predicted visual search asymmetries by chance become increasingly unlikely $\frac{1}{2^n}$. 
+    
+%     - Less Subtle: (B)
+%         E.g.\ borders between two textures of similar orientation are more salient when the bars are parallel to border, or open circle among closed circles are more salient then a closed circle among open circles. 
+        
+%         „example of visual search asymmetry through the presence or the absence of a feature in the target“ ([Zhaoping, 2014, p. 47](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=47&annotation=8FZFHNT6))
+
+%     - More subtle (A)
+%         - „Segmenting two identical abutting textures from each other“ ([Zhaoping, 2014, p. 53](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=53&annotation=FR8WH55Q))
+
+%        „subtle examples of visual search asymmetry“ ([Zhaoping, 2014, p. 54](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=54&annotation=3GNEFC4P))
+%         - 
+    
+%     - (A) Failures of Measurement / "Some examples of visual search asymmetries are due to higher level mechanisms" \cite{zhaoping_understanding_2014}
+%         We encountered an interesting exception: finding a symbol "N" among its mirror images is slower than finding a mirror image of "N" among "N"s, even if both visual inputs are mirror symmetric and thus the V1 model responses are identical. Interestingly, it turns out that measured eye gaze response times are identical, and the harder search might be explained by later confusion by the surrounding symbols, which show object invariance to the known symbol $N$. Since in general the response time $$RT_{task} = RT_{saliency} + RT_{top-down\ selection} + RT_{other}$$ this teaches the limit of $RT_{task}$ as a measurement of saliency.
+    
+% - medial axis effect (A)
+
+%     figure-ground segmentation and the medial axis e ect \cite{zhaoping_understanding_2014}
+    
+%     V1 model illustrates that saliency mechanisms in V1 can have side effects, e.g., medial axis effects.
+
+%     The V1 model also shows how saliency mechanisms in V1 can have non-trivial side effects, e.g.\ the medial axis effect and it's dependence on visual input contrast due to the increasing slope of the interneuron's activation function, which can be measured by responses to different grating sizes. 
+
+%     „Since figure-ground and medial axis effects arise from border effects, they are also weaker at lower input contrast. Consequently, the radius of the grating where a neuron’s summation curve (Fig. 5.35 B) peaks tends to be larger when the input contrast is weaker. This is true in the model and is also observed physiologically.“ ([Zhaoping, 2014, p. 62](zotero://select/library/items/472CBGBY)) ([pdf](zotero://open-pdf/library/items/QDERXENV?page=62&annotation=RYZ8X8CM)) ???
+
+% Limits and Extensions
+
+% - Limits of the model and possible extensions
+%     Add model neurons not tuned to orientation (such neurons exist in real V1)
+%     Add model neurons tuned to:
+%         color
+%         scale
+%         motion direction
+%         ocularity (different sensitivities to inputs to different eyes)
+%         disparity (for stereo vision, different receptive field locations and
+%         shapes to inputs to the two different eyes)
+%         and combinations of the above
+%     Extend iso-orientation suppression to iso-feature suppression
+
+%     „have large and unoriented receptive elds (see Fig. 3.32) can also be included in the model [...] „These neurons are likely to play an important role in saliency for round shapes or patches, perhaps contributing to the attentional attraction of a face (of a similar size to the receptive elds)“ \cite{zhaoping_understanding_2014}
+
+%     -> one such extension has been carried out for the case of color (Li 2002, Zhaoping and Snowden, 2006).  Similarly, although the model has mostly been applied to synthetic images (with a few exceptions (Li 1998a, Li  1999b, Li 2000b)), one can expect, and test, that the theory also applies to more realistic visual inputs such as  those from natural scenes. Maybe TODO: get into detail here
+    
+% Summary and outlook
+
+% - summary: see slides 
+
+% - outlook:
+%     Shortly most important arguments for V1SH, and how model compares to them:
+%         - "small CRFs implies that the spatial  resolution of a V1-based saliency map can be better than a map based anywhere downstream. Furthermore,  since V1 is at an early stage on the visual pathway, saliency can be signaled quickly. High spatial resolution and  alacrity are both desirable for bottom-up visual selection." \cite{zhaoping_understanding_2014}
+%         - "a saliency map should  cover the whole visual eld. Consequently, one expects that brain area(s) computing and reporting the  saliency map must be able to respond to the whole visual field" \cite{zhaoping_understanding_2014}
+%         - "over-representation greatly facilitates fast bottom-up  selection by V1 outputs [...] It is completely unclear how such a saliency function could be computed and  whether the computation would compromise the goal of fast saliency signaling along with adequate  representation of the visual input." \cite{zhaoping_understanding_2014}
+%         - occular singleton
+%         - parameter-free tests
+%         - ...
+    
+%     -> comparison of model to other arguments: TODO potentially add more
+%         „a theory should be ultimately tested against experiment data rather than just against model simulations“, " This is because the hypothesis is so explicit, and because the knowledge about V1’s physiology is extensive, that it is easy to predict from physiology to behavior via the medium of the hypothesis. It is also typically easier to test behavioral predictions using psychophysical experiments than to test physiological predictions by electrophysiological experiments.“ \cite{zhaoping_understanding_2014}
+    
+%         "Hence, it is not sufficient to record the activity of a single V1 neuron to determine  saliency; measurements across the neural population are required to determine whether one neuron signals  the most salient location." \cite{zhaoping_understanding_2014}
+    

@@ -205,3 +205,51 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.lof
+*.lot
+*.log
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.toc
+*.xdv
+
+# Intermediate or temporary files
+*.synctex(busy)
+*.synctex.gz(busy)
+*.tmp
+*.bak
+*.backup
+*.swp
+*.lock
+
+# Output files (PDFs, etc.)
+*.pdf
+*.dvi
+*.ps
+
+# TeXstudio junk
+*.auxlock
+*.synctex(busy)
+*.synctex.gz(busy)
+*.sav
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini

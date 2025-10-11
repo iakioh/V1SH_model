@@ -1,0 +1,64 @@
+%----------------------------------------------------------------------------------------
+% Essay
+%----------------------------------------------------------------------------------------
+\setcounter{page}{1} % Sets counter of page to 1
+
+\section*{1. Week}
+
+\paragraph{Set Up and Project Planning} After onboarding with Maria, I set up my software environment, using the programming language Python and a private Github repository. I planned the project, with the subgoals to finish model implementation within the first two weeks and replicating model behavior to visual inputs such as the medial axis effect \cite{zhaoping_understanding_2014} (including puffer time to debug the model) within another two weeks until the end of October. In my remaining time of approximate 4 weeks in November, I am planning to modify the replicated model and test it on new visual inputs. The remaining two weeks in December allow me to prepare my seminar presentation and finish the lab report. I brainstormed ideas for extensions of the V1 model with Vlad, and we came up with the idea to try finding new visual search asymmetries with the V1 model and test those predictions experimentally.  
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.85\linewidth]{figure/calibration_inputs.png}
+	\caption{Visual inputs replicated from Fig. 4.18 \cite{zhaoping_understanding_2014}}
+	\label{fig:inputs}
+\end{figure}
+
+\begin{wrapfigure}{rt}{0.4\textwidth}
+	\vspace{-15pt} % adjust vertical spacing
+	\centering
+	\includegraphics[width=0.38\textwidth]{figure/tuning_curve.png}
+	\caption{Implemented tuning curve decays exponentially and drops to $0$ for $|x| \geq \frac{\pi}{6} \approx 0.52$ as expected.}
+	\label{fig:tc}
+	\vspace{-5pt} % tighten bottom space
+\end{wrapfigure}
+\paragraph{V1 Model Implementation} I started by implementing visual inputs, see Fig.\ \ref{fig:inputs}. 
+The visual input to the model consists of bars with contrast $\hat{I}_{i\gamma}$ oriented at angles $\gamma$ and is filtered through the tuning curve $\phi$ of the model neuron at location $i$ with preferred orientation $\theta$, such that $I_{i\theta} = \hat{I}_{i\gamma} \cdot \phi(\theta - \gamma)$. The implemented orientation tuning curve \cite{zhaoping_understanding_2014} 
+\begin{equation}
+	\phi(\theta - \gamma) = \begin{cases}
+		0, & \text{if } |\theta-\gamma| \geq \frac{\pi}{6} \\
+		\exp(-\frac{|\theta - \gamma|}{\pi / 8}),  & \text{otherwise}
+	\end{cases}
+\end{equation}
+is shown in Fig.\ \ref{fig:tc}. 
+\noindent
+I further implemented a toy model 
+\begin{equation} \label{eq:toy_df}
+	\dot x_{i\theta} = - \alpha_x \cdot  x_{i\theta} + I_{i\theta}
+\end{equation}
+with $K = 12$ neurons per hypercolumn and $\alpha_x = 1$ to verify my implementation of the forward Euler method for numerical simulations
+\begin{equation}
+	\Delta x_{i\theta} \approx \dot x_{i\theta} \Delta t = (- \alpha_x \cdot  x_{i\theta} + I_{i\theta}) \Delta t.
+\end{equation}
+The analytic solution (for constant input solvable by separating variables to obtain the homogeneous solution of Eq.\ \ref{eq:toy_df}, and then varying the constants to obtain the full solution)
+\begin{equation}
+	x_{i\theta}(t) = \frac{I_{i\theta}}{\alpha} \left[1 - \exp(-\alpha_x t) \right]
+\end{equation}
+for $x_{i\theta}(t = 0) = 0$ was compared to the simulated trajectory using $\Delta t = 10^{-3}$, see Fig.\ \ref{fig:toy_model}.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.8\linewidth]{figure/toy_model.png}
+	\caption{Response of toy model neurons of one hypercolumn to a bar of $90^{\circ}$ orientation. As expected, an exponential decay to a resting state - the filtered input - is observed. Neurons tuned closer to the orientation of the input bar show higher resting state. Simulated (colored) and analytical (grey) trajectories overlap precisely.}
+	\label{fig:toy_model}
+\end{figure}
+
+In the end, I started to read and understand the stability analysis of the V1 model (pp.\ 285 onwards \cite{zhaoping_understanding_2014}). I also started to understand the noise term and learn more about stochastic differential equations, especially the Ornstein–Uhlenbeck (OU) process to model temporal correlations. 
+
+\paragraph{Goals for coming week}
+\begin{itemize}
+    \item Understand OU process and implement noise term (Euler-Maruyama method)
+    \item finish reading stability analysis, understand connectivity parametrization and implement connections
+    \item implement remaining model parts, i.e.\ activation functions and normalization term
+    \item verify full V1 model by replicating Fig.\ 5.18 (pp. 224) and 5.21 (pp. 229) \cite{zhaoping_understanding_2014}
+\end{itemize}
