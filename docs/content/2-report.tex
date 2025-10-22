@@ -62,3 +62,87 @@ In the end, I started to read and understand the stability analysis of the V1 mo
     \item implement remaining model parts, i.e.\ activation functions and normalization term
     \item verify full V1 model by replicating Fig.\ 5.18 (pp. 224) and 5.21 (pp. 229) \cite{zhaoping_understanding_2014}
 \end{itemize}
+
+\section*{2. Week}
+
+\paragraph{Review of Goals from last week}
+
+\begin{itemize}
+	\item Implemented noise model as noise pulses of average height (i.e.\ Root-Mean-Square) $\sigma_{noise}$ and average temporal width $\tau_{noise}$, such that the noise input to neuron $i$ with preferred orientation $\theta$ is distributed as
+		\begin{align*}
+			\Delta t_{i \theta} &\sim \text{Exp}(\frac{1}{\tau_{noise}}) \\
+			I_{noise}(i, \theta) &\sim \mathcal{N}(0, \sigma_{noise}^2)
+		\end{align*}
+	\item Understood mathematical parametrization and implemented connections, see Fig. \ref{fig:J}, \ref{fig:W} and \ref{fig:psi}
+	\item Implemented remaining model parts (normalization and activation functions, see Fig.\ \ref{fig:g}) and increased efficiency of simulating full model using parallelization and compilation tricks
+	\item Replicated Fig.\ 5.18 \cite{zhaoping_understanding_2014}, see Fig.\ \ref{fig:5.18} 
+	\item Replicated Fig.\ 5.21 \cite{zhaoping_understanding_2014}, see Fig.\  \ref{fig:5.21}
+	\item Started debugging full model: line-by-line review and second implementation 
+	\item Read and summarized Chapter 5.8.1.1 - 5.8.2.3 of \cite{zhaoping_understanding_2014}
+\end{itemize}
+
+\begin{figure}[htbp!]
+	\centering
+	\caption{Excitatory connections $J_{i\theta,j\theta'}$}
+	\includegraphics[width=\linewidth]{figure/J.png}
+	\label{fig:J}
+\end{figure}
+
+\begin{figure}[htbp!]
+	\centering
+	\caption{Inhibitory connections $W_{i\theta,j\theta'}$}
+	\includegraphics[width=\linewidth]{figure/W.png}
+	\label{fig:W}
+\end{figure}
+
+\begin{figure}[htbp!]
+    \centering
+	% Main caption
+    \caption{Activation functions $g_x$ and $g_y$}
+    % Subfigure 1
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figure/g_x.png}
+        % \caption{Caption for $g_x$}
+        \label{fig:gx}
+    \end{subfigure}
+    \hfill
+    % Subfigure 2
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figure/g_y.png}
+        % \caption{Caption for $g_y$}
+        \label{fig:gy}
+    \end{subfigure}
+    \label{fig:g}
+\end{figure}
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.9\linewidth]{figure/psi.png}
+	\caption{Spread of inhibition within one hypercolumn $\psi$}
+	\label{fig:psi}
+\end{figure}
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=\linewidth]{figure/Fig. 5.18.png}
+	\caption{Qualitative replication of contextual influences from Fig.\ 5.18 \cite{zhaoping_understanding_2014}. Even though harder to see by eye, C shows smaller response to the center bar than D, and F shows smaller response to the center bar than E. Absolute differences in responces to the center bar seem to look smaller than in the reference figure. From E - F, colinear facilitation seems to increase for smaller bar contrast less, and for higher bar contrast more than in the reference figure. The random background in C seems to supress the reponse less than in the reference figure, mabye because of different background patterns.}
+	\label{fig:5.18}
+\end{figure}
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=\linewidth]{figure/Fig_5.21.png}
+	\caption{Temporal evolution of model reponse to input pattern from Fig.\ 5.21 \cite{zhaoping_understanding_2014}. Temporal evolution is faster than in the reference figure, which suggest a logical error in the model implementation.}
+	\label{fig:5.21}
+\end{figure}
+
+\paragraph{Goals for coming week}
+\begin{itemize}
+    \item Finish reading and summarize chapter 5.8.2, i.e.\ 5.8.2.4 - 4.8.2.7 \cite{zhaoping_understanding_2014}
+    \item Refactor existing code and implement the model in increasing complexity starting from two interacting pairs of neurons (see chapter 5.8.2 \cite{zhaoping_understanding_2014}), verify the implementation through analytic properties and replicate the findings of chapter 5.8.2. \cite{zhaoping_understanding_2014} up until I..
+    \item ..find the cause of the difference between the results of the two different model implementation and the slow model dynamics of Fig.\ \ref{fig:5.21}
+    \item To leave enough time to find a good project, brainstorm and talk about initial ideas for possible extensions with Prof.\ Zhaoping latest during next lab meeting
+    \item If time permits, start replicating Fig.\ 5.34 and 5.35, i.e.\ the Figure-Ground Segmentation and Medial Axis Effect \cite{zhaoping_understanding_2014}
+\end{itemize}
