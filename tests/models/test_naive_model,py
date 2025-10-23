@@ -1,0 +1,94 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+
+from src.models import NaiveModel, analytical_solution
+
+
+def test_naive_model():
+    """Test the NaiveModel class"""
+
+    # Instantiate and test the NaiveModel
+    model = NaiveModel(K=10, alpha=1.0)
+
+    A = np.array([[90 / 180 * np.pi]])
+    C = np.array([[2.0]])
+
+    T = 8
+    dt = 0.001
+    X_gen, I = model.simulate(A, C, dt=dt, T=T, verbose=False)
+
+    assert I.shape == (1, 1, model.K)
+    assert X_gen.shape == (T / dt, 1, 1, model.K)
+
+
+def test_euler_method():
+    # Instantiate and test the NaiveModel
+    model = NaiveModel(K=10, alpha=1.0)
+
+    A = np.array([[90 / 180 * np.pi]])
+    C = np.array([[2.0]])
+
+    T = 8
+    dt = 0.001
+    X_gen, I = model.simulate(A, C, dt=dt, T=T, verbose=False)
+
+    t = np.arange(X_gen.shape[0]) * dt
+    X_gt = analytical_solution(t, I, model.alpha)
+
+    plt.rcParams.update({"font.size": 12})
+    plt.figure(figsize=(6, 4), dpi=300, constrained_layout=True)
+    labels = [f"{round(180 / model.K * k)}°" for k in range(model.K)]
+    colors = plt.cm.hsv(
+        np.linspace(0, 1, model.K, endpoint=False)
+    )  # Use twilight colormap
+    linestyles = ["-", "--", "-.", ":"] * ((model.K // 4) + 1)  # Cycle through styles
+    markers = ["o", "s", "D", "^", "v", "<", ">", "p", "*", "h"] * (
+        (model.K // 10) + 1
+    )  # Cycle through markers
+
+    for k_post in range(model.K):
+        plt.plot(
+            t,
+            X_gen[:, 0, 0, k_post],
+            linestyle=linestyles[k_post],
+            label=f"{labels[k_post]}",
+            color=colors[k_post],
+            alpha=0.8,
+            linewidth=2,
+            marker=markers[k_post],
+            markevery=(
+                k_post * round(len(t) / 6 / model.K),
+                round(len(t) / 6),
+            ),  # Offset markers for each line
+            markeredgecolor="black",  # Add black outline
+            markeredgewidth=0.6,
+        )
+        plt.plot(
+            t,
+            X_gt[:, 0, 0, k_post],
+            linestyle="-",
+            color="k",
+            alpha=0.1,
+            linewidth=4,
+            label="Analytical\nSolutions" if k_post == model.K - 1 else None,
+        )
+    plt.legend(
+        loc="center right",
+        title="Preferred\norientation",
+        framealpha=1.0,
+        fontsize=8,
+        title_fontsize=9,
+    )
+    plt.xlabel("Time [per time constant]")
+    plt.ylabel("Model response")
+    plt.title(
+        "Response of model neurons in one hypercolumn\n"
+        + r"to a bar of orientation $\theta = 90^\circ$ and contrast $\hat{I} = 2$"
+    )
+
+    output_path = "tests/figures/naive_model.png"
+    plt.savefig(output_path)
+    plt.close()
+
+    assert os.path.exists(output_path), f"Plot was not saved to {output_path}"
