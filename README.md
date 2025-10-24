@@ -6,26 +6,20 @@ I can use [GitHub-flavored Markdown](https://guides.github.com/features/masterin
 
 ## Installation
 
-''' 
+``` 
 python -m venv venv 
-'''
-
-''' 
 source venv/bin/activate 
-'''
-
-''' 
 pip install -r requirements.txt 
-'''
+```
 
-''' 
+```
 pip install -e . 
-'''
+```
 
 ## Testing
 
-''' 
+``` 
 pytest tests/ 
-'''
+```
 
 
