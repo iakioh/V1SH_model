@@ -1,6 +1,7 @@
 from numba import njit, prange
 import numpy as np
 from tqdm import tqdm
+from typing import Optional, Callable
 
 from v1sh_model.utils.connections import compute_connection_kernel
 from v1sh_model.utils.activations import g_x, g_y
@@ -24,7 +25,32 @@ def summation_numba(
     J_o: float,
     alpha_x: float,
     alpha_y: float,
+    W_o: float = 1.,
 ):  
+    """ Computes the summation terms for the derivatives dX/dt and dY/dt using Numba for acceleration
+    
+    Parameters:
+        X (np.ndarray): Current state of pyramidal cells, shape (N_y, N_x, K)
+        Y (np.ndarray): Current state of interneurons, shape (N_y, N_x, K)
+        g_X (np.ndarray): Activated state of pyramidal cells, shape (N_y, N_x, K)
+        g_Y (np.ndarray): Activated state of interneurons, shape (N_y, N_x, K)
+        g_X_padded (np.ndarray): Padded activated state of pyramidal cells, shape (N_y + pad, N_x + pad, K)
+        I (np.ndarray): Input, shape (N_y, N_x, K)
+        I_o (np.ndarray): Normalization term for pyramidal cells, shape (N_y, N_x, K)
+        I_c (float): Normalization term for interneurons
+        Psi (np.ndarray): Within hypercolumn interaction kernel, shape (1, 1, K, K)
+        J (np.ndarray): Between hypercolumn interaction kernel for pyramidal cells, shape (kernel_size, kernel_size, K, K)
+        W (np.ndarray): Between hypercolumn interaction kernel for interneurons, shape (kernel_size, kernel_size, K, K)
+        J_o (float): weight of connection from interneuron to corresponding pyramidal cell
+        alpha_x (float): Time constant of pyramidal cells
+        alpha_y (float): Time constant of interneurons
+        W_o (float): weigth of connection from pyramidal cell to corresponding interneuron
+        
+    Returns:
+        dXdt (np.ndarray): Derivative of pyramidal cells state, shape (N_y, N_x, K)
+        dYdt (np.ndarray): Derivative of interneurons state, shape (N_y, N_x, K)
+    """
+    
     N_y, N_x, K = X.shape
     kernel_size = W.shape[0] # odd, square,same for J
     assert kernel_size % 2 == 1, "Kernel size must be odd"
@@ -46,7 +72,7 @@ def summation_numba(
 
                 dydt = (
                     - alpha_y * Y[n_y, n_x, k_post]
-                    + g_X[n_y, n_x, k_post]
+                    + W_o * g_X[n_y, n_x, k_post]
                     + I_c
                 )
 
@@ -79,19 +105,27 @@ def summation_numba(
 class V1_model_2:
     def __init__(
         self,
-        K=12,
-        alpha_x=1.0,
-        alpha_y=1.0,
-        average_noise_height=0.1,
-        average_noise_temporal_width=0.1,
-        seed=None,
+        K : int = 12,
+        alpha_x : float = 1.0,
+        alpha_y : float = 1.0,
+        g_x : Callable = g_x,
+        g_y : Callable = g_y,
+        I_o : Callable = I_o,
+        I_c : Callable = I_c,
+        average_noise_height : float = 0.1,
+        average_noise_temporal_width : float = 0.1,
+        seed : Optional[float] = None,
     ):
-        """Initializes the full V1 model with pyramidal cells and interneurons
+        """ Initializes the full V1 model with pyramidal cells and interneurons
 
         Parameters:
             K (int): Number of orientation channels, default 12
             alpha_x (float): Time constant of pyramidal cells, default 1.0
             alpha_y (float): Time constant of interneurons, default 1.0
+            g_x (Callable): Activation function for pyramidal cells, default g_x
+            g_y (Callable): Activation function for interneurons, default g_y
+            I_o (Callable): Normalization function for pyramidal cells, default I_o
+            I_c (Callable): Normalization function for interneurons, default I_c
             average_noise_height (float): Standard deviation of noise amplitude, default 0.1
             average_noise_temporal_width (float): Average temporal width of noise, default 0.1
             seed (int or None): Random seed for noise generation, default None
@@ -252,7 +286,7 @@ class V1_model_2:
         dt: float,
         T: float,
         noisy: bool = True,
-        mode: str = "symmetric",
+        mode: str = "wrap",
     ) -> np.ndarray:
         """Simulates the model over time given input I
 
@@ -260,6 +294,8 @@ class V1_model_2:
             I (np.ndarray): Input, shape (N_y, N_x, K)
             dt (float): Time step
             T (float): Total simulation time
+            noisy (bool): If True, add noise to the simulation; default True
+            mode (str): boundary condition of simulation (see np.pad); default "wrap"
 
         Returns:
             X (np.ndarray): Final pyramidal state after simulation, shape (T, N_y, N_x, K)
@@ -292,7 +328,6 @@ class V1_model_2:
         update_steps = int(0.05 / dt)
         with tqdm(total=steps, desc="Simulating", unit="step") as pbar:
             for t in range(1, steps):
-                # start_time_step = time.time()
                 dXdt, dYdt = self.derivative(X[t - 1], Y[t - 1], I, mode=mode)
                 X[t] = X[t - 1] + dt * dXdt
                 Y[t] = Y[t - 1] + dt * dYdt
@@ -308,9 +343,6 @@ class V1_model_2:
                 if (t >= 1) and ((t - 1) % update_steps == 0):
                     pbar.update(update_steps)
 
-                # end_time_step = time.time()
-                # print(f"Time step {t}/{steps} computation time: {end_time_step - start_time_step:.4f} seconds")
-
         return X, Y
 
     def simulate(
@@ -321,7 +353,7 @@ class V1_model_2:
         T: float = 12.0,
         verbose: bool = False,
         noisy: bool = True,
-        mode: str = "symmetric",
+        mode: str = "wrap",
     ) -> np.ndarray:
         """Runs the full simulation given angles A and contrasts C
 
@@ -332,7 +364,7 @@ class V1_model_2:
             T (float): Total simulation time
             verbose (bool): If True, visualize input; default False
             noisy (bool): If True, add noise to the simulation; default True
-            mode (str): boundary condition of simulation (see np.pad); default "symmetric"
+            mode (str): boundary condition of simulation (see np.pad); default "wrap"
 
         Returns:
             X (np.ndarray): Final state after simulation, shape (T, N_y, N_x, K)
