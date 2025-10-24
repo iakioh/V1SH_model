@@ -106,6 +106,7 @@ class V1_model_2:
     def __init__(
         self,
         K : int = 12,
+        tuning_curve : Callable = tuning_curve,
         compute_connection_kernel : Callable = compute_connection_kernel,
         J_o : float = 0.8,
         W_o : float = 1.0,
@@ -133,6 +134,9 @@ class V1_model_2:
             average_noise_temporal_width (float): Average temporal width of noise, default 0.1
             seed (int or None): Random seed for noise generation, default None
         """
+        # Tuning curve function
+        self.tuning_curve = tuning_curve
+        
         # Membrane time constants
         self.alpha_x = alpha_x
         self.alpha_y = alpha_y
@@ -194,7 +198,7 @@ class V1_model_2:
         A = A[:, :, np.newaxis]  # shape (N_y, N_x, 1)
         C = C[:, :, np.newaxis]  # shape (N_y, N_x, 1)
 
-        I = C * tuning_curve(A - M)
+        I = C * self.tuning_curve(A - M)
 
         if verbose:
             visualize_input(A, C, verbose=True)
@@ -237,7 +241,7 @@ class V1_model_2:
         Y: np.ndarray,
         I: np.ndarray,
         I_top_down: float = 0.0,
-        mode: str = "symmetric",
+        mode: str = "wrap",
     ) -> np.ndarray:
         """Computes the derivative dX/dt and dY/dt of the model at current state X and Y given input I
 
@@ -292,6 +296,7 @@ class V1_model_2:
         T: float,
         noisy: bool = True,
         mode: str = "wrap",
+        initial_condition: Optional[tuple[np.ndarray, np.ndarray]] = None,
     ) -> np.ndarray:
         """Simulates the model over time given input I
 
@@ -316,6 +321,13 @@ class V1_model_2:
 
         # Interneuon state over time
         Y = np.zeros((steps, N_y, N_x, K), dtype=np.float64)
+        
+        if initial_condition is not None:
+            X_0, Y_0 = initial_condition
+            assert X_0.shape == (N_y, N_x, K), "Initial condition X_0 has incorrect shape"
+            assert Y_0.shape == (N_y, N_x, K), "Initial condition Y_0 has incorrect shape"
+            X[0] = X_0
+            Y[0] = Y_0
 
         # Noise initialization
         if noisy:
@@ -359,6 +371,7 @@ class V1_model_2:
         verbose: bool = False,
         noisy: bool = True,
         mode: str = "wrap",
+        initial_condition: Optional[tuple[np.ndarray, np.ndarray]] = None,
     ) -> np.ndarray:
         """Runs the full simulation given angles A and contrasts C
 
@@ -370,10 +383,11 @@ class V1_model_2:
             verbose (bool): If True, visualize input; default False
             noisy (bool): If True, add noise to the simulation; default True
             mode (str): boundary condition of simulation (see np.pad); default "wrap"
-
+            initial_condition (tuple[np.ndarray, np.ndarray] or None): Initial condition for (X, Y); default None
+            
         Returns:
             X (np.ndarray): Final state after simulation, shape (T, N_y, N_x, K)
         """
         I = self.get_input(A, C, verbose=verbose)
-        X, Y = self.euler_method(I, dt, T, noisy=noisy, mode=mode)
+        X, Y = self.euler_method(I, dt, T, noisy=noisy, mode=mode, initial_condition = initial_condition)
         return X, Y, I
