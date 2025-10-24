@@ -1,0 +1,26 @@
+[project]
+name = "v1sh_model"
+version = "0.0.1"
+authors = [
+  { name="Kai Rothe" },
+]
+description = "Neural circuit model of visual primary cortex (V1) for the V1 Saliency Hypothesis"
+readme = "README.md"
+requires-python = ">=3.13"
+classifiers = [
+    "Private :: Do Not Upload"
+]
+license = "GPL-3.0-only"
+license-files = ["LICEN[CS]E*"]
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "pytest",
+    "tqdm",
+    "scipy",
+    "numba",
+]
+
+[project.urls]
+Homepage = "https://github.com/iakioh/V1SH_model"
+Issues = "https://github.com/iakioh/V1SH_model/issues"

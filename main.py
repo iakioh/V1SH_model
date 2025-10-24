@@ -1,7 +1,7 @@
 # example simulation using V1_model_1 with neighboring textures input
 
-from src.models.V1_model_1 import V1_model_1
-from src.inputs.examples import neighboring_textures
+from v1sh_model.models.V1_model_1 import V1_model_1
+from v1sh_model.inputs.examples import neighboring_textures
 
 if __name__ == "__main__":
     seed = 42

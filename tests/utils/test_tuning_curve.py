@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-from src.utils.tuning_curve import tuning_curve
+from v1sh_model.utils.tuning_curve import tuning_curve
 
 def test_tuning_curve():
     k_post = 10000

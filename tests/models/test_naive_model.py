@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-from src.models import NaiveModel, analytical_solution
+from v1sh_model.models.naive_model import NaiveModel, analytical_solution
 
 
 def test_naive_model():

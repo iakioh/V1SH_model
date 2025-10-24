@@ -1,7 +1,7 @@
 import numpy as np
 
-from src.inputs.visualize import visualize_input, visualize_output
-from src.utils.tuning_curve import tuning_curve
+from v1sh_model.inputs.visualize import visualize_input, visualize_output
+from v1sh_model.utils.tuning_curve import tuning_curve
 
 class NaiveModel:
     def __init__(self, K=12, alpha=1.0):
@@ -72,7 +72,7 @@ class NaiveModel:
             X (np.ndarray): Final state after simulation, shape (T, N_y, N_x, K)
         """
 
-        steps = int(T // dt)
+        steps = int(T / dt)
         X = np.zeros((steps, *I.shape))
 
         X[0] = np.zeros_like(I)  # initial state = input
@@ -107,18 +107,18 @@ class NaiveModel:
         return X, I
         
 
-    def analytical_solution(t: np.ndarray, I: np.ndarray, alpha: float) -> np.ndarray:
-        """Computes the analytical solution of the ODE at time t given input I and parameter alpha.
-            Assumes constant input, and initial condition X(t = 0) = 0.
+def analytical_solution(t: np.ndarray, I: np.ndarray, alpha: float) -> np.ndarray:
+    """Computes the analytical solution of the ODE at time t given input I and parameter alpha.
+        Assumes constant input, and initial condition X(t = 0) = 0.
 
-        Parameters:
-            t (np.ndarray): Time points, shape (N_t,)
-            I (np.ndarray): Input, shape (N_y, N_x, K)
-            alpha (float): Model parameter
+    Parameters:
+        t (np.ndarray): Time points, shape (N_t,)
+        I (np.ndarray): Input, shape (N_y, N_x, K)
+        alpha (float): Model parameter
 
-        Returns:
-            (np.ndarray): Analytical solution at time t, shape (N_y, N_x, K)
-        """
-        t_ = t[:, np.newaxis, np.newaxis, np.newaxis]  # shape (N_t, 1, 1, 1)
-        I_ = I[np.newaxis, :, :, :]  # shape (1, N_y, N_x, K)
-        return (1 - np.exp(-alpha * t_)) / alpha * I_
+    Returns:
+        (np.ndarray): Analytical solution at time t, shape (N_y, N_x, K)
+    """
+    t_ = t[:, np.newaxis, np.newaxis, np.newaxis]  # shape (N_t, 1, 1, 1)
+    I_ = I[np.newaxis, :, :, :]  # shape (1, N_y, N_x, K)
+    return (1 - np.exp(-alpha * t_)) / alpha * I_

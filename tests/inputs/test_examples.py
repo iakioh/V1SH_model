@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import os
 
-from src.inputs.visualize import visualize_input
-from src.inputs.examples import (
+from v1sh_model.inputs.visualize import visualize_input
+from v1sh_model.inputs.examples import (
     bar_without_surround,
     iso_orientation,
     random_background,
@@ -50,7 +50,7 @@ def test_examples():
         visualize_input(A, C, verbose=False, axis=ax)
         ax.set_title(title)
 
-    output_path = "./tests/figures/examples.png"
+    output_path = "./tests/figures/calibration_inputs.png"
     plt.savefig(output_path, dpi=dpi)
     plt.close()
 

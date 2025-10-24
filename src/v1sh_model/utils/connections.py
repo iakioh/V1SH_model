@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 
-from src.inputs.visualize import plot_bars
+from v1sh_model.inputs.visualize import plot_bars
 
 
 def compute_psi(theta, K, atol=1e-6):
@@ -226,14 +226,14 @@ def compute_connection_kernel(K=12, verbose=False) -> np.ndarray:
 
 
 def visualize_weights(
-    W, J, Psi, k_pres=[0, 6], K=12, dpi=200, verbose=False, colored=True
+    W, J, Psi, k_pres=[0, 6], K=12, dpi=300, verbose=False, colored=True
 ):
     N_y, N_x = W.shape[0], W.shape[1]
     A = np.linspace(0, np.pi, K, endpoint=False)
     A = A[np.newaxis, np.newaxis, :]  # shape (1, 1, K)
     A = np.broadcast_to(A, (N_y, N_x, K))  # shape (N_y, N_x, K)
 
-    plt.rcParams.update({"font.size": 8})
+    plt.rcParams.update({"font.size": 10})
 
     for k_pre in k_pres:  # preferred orientation of presynaptic neuron
         if colored:
@@ -281,6 +281,8 @@ def visualize_weights(
                 framealpha=1.0,
             )
 
+            plt.tight_layout()
+
             return fig
         else:  # replicate fig. 4 from A Neural Model of Contour Integration, Zhaoping Li, 1998
             center_bar = np.zeros((N_y, N_x, K))
@@ -298,7 +300,8 @@ def visualize_weights(
                 color="k",
             )
             plot_bars(A, center_bar, verbose=False, dpi=dpi, color="k", axis=axis)
-            plt.title("Horizontal connections J\nto excitatory post-synaptic cells")
+            # plt.title("Horizontal connections J\nto excitatory post-synaptic cells")
+            plt.tight_layout()
 
             fig_2, axis = plt.subplots(
                 figsize=(12, 5), constrained_layout=True, dpi=dpi
@@ -312,6 +315,7 @@ def visualize_weights(
                 color="k",
             )
             plot_bars(A, center_bar, verbose=False, dpi=dpi, color="k", axis=axis)
-            plt.title("Horizontal connections W\nto inhibitory post-synaptic cells")
+            # plt.title("Horizontal connections W\nto inhibitory post-synaptic cells")
+            plt.tight_layout()
 
             return fig_1, fig_2

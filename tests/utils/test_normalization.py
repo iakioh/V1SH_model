@@ -2,9 +2,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
+from v1sh_model.utils.normalization import I_o, I_c
 
-from src.utils.normalization import I_o
-
+def test_I_c():
+    topdown_inputs = [0.0, 1.0, -1.0, 5.0, -5.0, 10.0, -10.0]
+    for I_td in topdown_inputs:
+        expected_value = 1.0 + I_td
+        computed_value = I_c(I_top_down=I_td)
+        assert computed_value == expected_value, (
+            f"For I_top_down={I_td}, expected {expected_value} but got {computed_value}"
+        )
 
 def test_I_o_1(verbose=False):
     # 1)

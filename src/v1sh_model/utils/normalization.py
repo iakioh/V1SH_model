@@ -1,17 +1,19 @@
 import numpy as np
 from scipy.ndimage import convolve
 
+from v1sh_model.utils.activations import g_x
 
-def I_o(g_X: np.ndarray):
+
+def I_o(X: np.ndarray):
     """Computes normalization term of pyramidal cells
 
     Parameters:
-        g_X (np.ndarray): Acitvated state of pyramidal cells, shape (N_y, N_x, K)
+        X (np.ndarray): state of pyramidal cells, shape (N_y, N_x, K)
 
     Returns:
         (np.ndarray): normalization term, shape (N_y, N_x, 1), values in [0, inf]
     """
-
+    g_X = g_x(X)
     g_X_summed_over_K = g_X.sum(axis=-1, keepdims=True)  # shape (N_y, N_x, 1)
 
     # neighbors on Manhatten Grid with distance maximal 2
