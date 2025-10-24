@@ -106,6 +106,9 @@ class V1_model_2:
     def __init__(
         self,
         K : int = 12,
+        compute_connection_kernel : Callable = compute_connection_kernel,
+        J_o : float = 0.8,
+        W_o : float = 1.0,
         alpha_x : float = 1.0,
         alpha_y : float = 1.0,
         g_x : Callable = g_x,
@@ -145,7 +148,8 @@ class V1_model_2:
         assert kernel_size % 2 == 1, "Kernel size must be odd"
         assert (self.W.shape[0] == self.W.shape[1]), "Kernels must be square"
         assert (self.J.shape[0] == self.W.shape[0]) and (self.J.shape[1] == self.W.shape[1]), "J and W must have the same shape"
-        self.J_o = 0.8
+        self.J_o = J_o
+        self.W_o = W_o
 
         # Normalization terms
         self.I_o = I_o
@@ -276,6 +280,7 @@ class V1_model_2:
             self.J_o,
             self.alpha_x,
             self.alpha_y,
+            self.W_o
         )
 
         return dXdt, dYdt
