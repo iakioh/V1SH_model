@@ -1,8 +1,9 @@
 # replicate fig. 5.18 in "Understanding Vision" (Li Zhaoping, 2014)
-import numpy as np
-import concurrent.futures 
 
-from v1sh_model.models.V1_model_1 import V1_model_1 as V1_model
+import numpy as np
+import concurrent.futures
+
+from v1sh_model.models.V1_model_2 import V1_model_2 as V1_model
 from v1sh_model.inputs.examples import (
     bar_without_surround,
     iso_orientation,
@@ -16,8 +17,8 @@ from v1sh_model.inputs.examples import (
 
 if __name__ == "__main__":
     model = V1_model()
-    g_x = model.g_x  
-    
+    g_x = model.g_x
+
     T = 12.0
     dt = 0.001
     N_y_test, N_x_test = 9 + 2 * 10, 9 + 2 * 10
@@ -37,15 +38,17 @@ if __name__ == "__main__":
     input_and_outputs = {}
     for title, func in test_cases.items():
         # create input images
-        A_in, C_in = func(N_y = N_y_test, N_x = N_x_test) # A, C shape (N_y, N_x)
-        
+        A_in, C_in = func(N_y=N_y_test, N_x=N_x_test)  # A, C shape (N_y, N_x)
+
         # simulate model
-        X, _, _ = model.simulate(A_in, C_in, dt=dt, T=T, verbose=False, noisy=True, mode="wrap")
+        X, _, _ = model.simulate(
+            A_in, C_in, dt=dt, T=T, verbose=False, noisy=True, mode="wrap"
+        )
         model_output = g_x(X).mean(axis=0)  # N_y x N_x x K
-        C_out = model_output.max(axis=-1) # N_y x N_x
-        argmax_angle_indices = model_output.argmax(axis=-1) # N_y x N_x
-        A_out = np.pi / model.K * argmax_angle_indices # N_y x N_x
-        
+        C_out = model_output.max(axis=-1)  # N_y x N_x
+        argmax_angle_indices = model_output.argmax(axis=-1)  # N_y x N_x
+        A_out = np.pi / model.K * argmax_angle_indices  # N_y x N_x
+
         input_and_outputs[title] = (A_in, C_in, A_out, C_out)
 
     # def run_test_case(args):
@@ -53,14 +56,14 @@ if __name__ == "__main__":
     #     title, N_y_test, N_x_test, dt, T = args
     #     func = test_cases[title]
     #     A_in, C_in = func(N_y=N_y_test, N_x=N_x_test)
-        
+
     #     # simulate model
     #     X, _, _ = model.simulate(A_in, C_in, dt=dt, T=T, verbose=False, noisy=True, mode="wrap")
     #     model_output = model.g_x(X).mean(axis=0)
     #     C_out = model_output.max(axis=-1)
     #     argmax_angle_indices = model_output.argmax(axis=-1)
     #     A_out = np.pi / model.K * argmax_angle_indices
-        
+
     #     return title, (A_in, C_in, A_out, C_out)
 
     # # Prepare arguments for each test case
@@ -77,7 +80,7 @@ if __name__ == "__main__":
     #     for future in concurrent.futures.as_completed(futures):
     #         key, result = future.result()
     #         input_and_outputs[key] = result
-            
+
     # save results
     output_path = "data/calibration_results.npz"
     np.savez_compressed(output_path, **input_and_outputs)
