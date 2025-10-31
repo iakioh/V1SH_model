@@ -74,7 +74,7 @@ def plot_bars(
                     solid_capstyle="butt",
                 )
 
-    if verbose:
+    if verbose and fig is not None:
         plt.show()
 
     return fig

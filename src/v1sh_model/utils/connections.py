@@ -226,7 +226,7 @@ def compute_connection_kernel(K=12, verbose=False) -> np.ndarray:
 
 
 def visualize_weights(
-    W, J, Psi, k_pres=[0, 6], K=12, dpi=300, verbose=False, colored=True
+    W, J, Psi, k_pre=6, K=12, dpi=300, verbose=False, colored=True
 ):
     N_y, N_x = W.shape[0], W.shape[1]
     A = np.linspace(0, np.pi, K, endpoint=False)
@@ -234,88 +234,86 @@ def visualize_weights(
     A = np.broadcast_to(A, (N_y, N_x, K))  # shape (N_y, N_x, K)
 
     plt.rcParams.update({"font.size": 10})
+    if colored:
+        fig, axis = plt.subplots(figsize=(12, 5), constrained_layout=True, dpi=dpi)
+        blue_line = mlines.Line2D([], [], color="tab:blue", label=r"$J$")
+        plot_bars(
+            A,
+            J[:, :, :, k_pre] * 7.5,
+            verbose=False,
+            dpi=dpi,
+            axis=axis,
+            color="tab:blue",
+        )
 
-    for k_pre in k_pres:  # preferred orientation of presynaptic neuron
-        if colored:
-            fig, axis = plt.subplots(figsize=(12, 5), constrained_layout=True, dpi=dpi)
-            blue_line = mlines.Line2D([], [], color="tab:blue", label=r"$J$")
-            plot_bars(
-                A,
-                J[:, :, :, k_pre] * 7.5,
-                verbose=False,
-                dpi=dpi,
-                axis=axis,
-                color="tab:blue",
-            )
+        red_line = mlines.Line2D([], [], color="tab:red", label=r"$W$")
+        plot_bars(
+            A,
+            W[:, :, :, k_pre] * 7.5,
+            verbose=False,
+            dpi=dpi,
+            color="tab:red",
+            axis=axis,
+        )
 
-            red_line = mlines.Line2D([], [], color="tab:red", label=r"$W$")
-            plot_bars(
-                A,
-                W[:, :, :, k_pre] * 7.5,
-                verbose=False,
-                dpi=dpi,
-                color="tab:red",
-                axis=axis,
-            )
+        green_line = mlines.Line2D([], [], color="tab:green", label=r"$\psi$")
+        Psi_broadcasted = np.zeros_like(W)
+        Psi_broadcasted[W.shape[0] // 2, W.shape[1] // 2, :, :] = Psi[0, 0, :, :]
+        plot_bars(
+            A,
+            Psi_broadcasted[:, :, :, k_pre],
+            verbose=False,
+            dpi=dpi,
+            color="tab:green",
+            axis=axis,
+        )
 
-            green_line = mlines.Line2D([], [], color="tab:green", label=r"$\psi$")
-            Psi_broadcasted = np.zeros_like(W)
-            Psi_broadcasted[W.shape[0] // 2, W.shape[1] // 2, :, :] = Psi[0, 0, :, :]
-            plot_bars(
-                A,
-                Psi_broadcasted[:, :, :, k_pre],
-                verbose=False,
-                dpi=dpi,
-                color="tab:green",
-                axis=axis,
-            )
+        center_bar = np.zeros((N_y, N_x, K))
+        center_bar[10, 10, k_pre] = 1
+        black_line = mlines.Line2D([], [], color="k", label="presynaptic neuron")
+        plot_bars(A, center_bar, verbose=False, dpi=dpi, color="k", axis=axis)
 
-            center_bar = np.zeros((N_y, N_x, K))
-            center_bar[10, 10, k_pre] = 1
-            black_line = mlines.Line2D([], [], color="k", label="presynaptic neuron")
-            plot_bars(A, center_bar, verbose=False, dpi=dpi, color="k", axis=axis)
+        plt.legend(
+            handles=[blue_line, red_line, green_line, black_line],
+            loc="upper right",
+            framealpha=1.0,
+        )
 
-            plt.legend(
-                handles=[blue_line, red_line, green_line, black_line],
-                loc="upper right",
-                framealpha=1.0,
-            )
+        plt.tight_layout()
 
-            plt.tight_layout()
+        return fig
+    else:  # replicate fig. 4 from A Neural Model of Contour Integration, Zhaoping Li, 1998
+        center_bar = np.zeros((N_y, N_x, K))
+        center_bar[10, 10, k_pre] = 4
 
-            return fig
-        else:  # replicate fig. 4 from A Neural Model of Contour Integration, Zhaoping Li, 1998
-            center_bar = np.zeros((N_y, N_x, K))
-            center_bar[10, 10, k_pre] = 4
+        fig_1, axis = plt.subplots(
+            figsize=(12, 5), constrained_layout=True, dpi=dpi
+        )
+        plot_bars(
+            A,
+            (J[:, :, :, k_pre] > 0) * 0.5,
+            verbose=False,
+            dpi=dpi,
+            axis=axis,
+            color="k",
+        )
+        plot_bars(A, center_bar, verbose=False, dpi=dpi, color="k", axis=axis)
+        # plt.title("Horizontal connections J\nto excitatory post-synaptic cells")
+        plt.tight_layout()
 
-            fig_1, axis = plt.subplots(
-                figsize=(12, 5), constrained_layout=True, dpi=dpi
-            )
-            plot_bars(
-                A,
-                (J[:, :, :, k_pre] > 0) * 0.5,
-                verbose=False,
-                dpi=dpi,
-                axis=axis,
-                color="k",
-            )
-            plot_bars(A, center_bar, verbose=False, dpi=dpi, color="k", axis=axis)
-            # plt.title("Horizontal connections J\nto excitatory post-synaptic cells")
-            plt.tight_layout()
+        fig_2, axis = plt.subplots(
+            figsize=(12, 5), constrained_layout=True, dpi=dpi
+        )
+        plot_bars(
+            A,
+            (W[:, :, :, k_pre] > 0) * 0.5,
+            verbose=False,
+            dpi=dpi,
+            axis=axis,
+            color="k",
+        )
+        plot_bars(A, center_bar, verbose=False, dpi=dpi, color="k", axis=axis)
+        # plt.title("Horizontal connections W\nto inhibitory post-synaptic cells")
+        plt.tight_layout()
 
-            fig_2, axis = plt.subplots(
-                figsize=(12, 5), constrained_layout=True, dpi=dpi
-            )
-            plot_bars(
-                A,
-                (W[:, :, :, k_pre] > 0) * 0.5,
-                verbose=False,
-                dpi=dpi,
-                axis=axis,
-                color="k",
-            )
-            plot_bars(A, center_bar, verbose=False, dpi=dpi, color="k", axis=axis)
-            # plt.title("Horizontal connections W\nto inhibitory post-synaptic cells")
-            plt.tight_layout()
-
-            return fig_1, fig_2
+        return fig_1, fig_2

@@ -1,9 +1,9 @@
 import numpy as np
 
 
-def bar_without_surround(N_y=9, N_x=9):
+def bar_without_surround(N_y=9, N_x=9, I_input=3.5):
     C = np.zeros((N_y, N_x))
-    C[int((N_y - 1) / 2), int((N_x - 1) / 2)] = 3.5
+    C[int((N_y - 1) / 2), int((N_x - 1) / 2)] = I_input
     A = np.zeros((N_y, N_x))
     return A, C
 
@@ -47,7 +47,7 @@ def with_one_flanker(N_y=9, N_x=9):
 def with_two_flankers(N_y=9, N_x=9):
     C = np.zeros((N_y, N_x))
     y_mid, x_mid = int((N_y - 1) / 2), int((N_x - 1) / 2)
-    C[y_mid, x_mid] = 1.5
+    C[y_mid, x_mid] = 1.05
     C[y_mid - 1, x_mid] = 3.5
     C[y_mid + 1, x_mid] = 3.5
     A = np.zeros((N_y, N_x))
@@ -60,7 +60,7 @@ def with_flanking_line_and_noise(N_y=9, N_x=9, seed=None):
     y_mid, x_mid = int((N_y - 1) / 2), int((N_x - 1) / 2)
     A[:, x_mid] = 0.0
     C = np.full((N_y, N_x), 3.5)
-    C[y_mid, x_mid] = 1.5
+    C[y_mid, x_mid] = 1.05
     return A, C
 
 

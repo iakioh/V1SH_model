@@ -36,7 +36,7 @@ def test_compute_psi():
 def test_compute_WJ():
     K = 12
     J, W, Psi = compute_connection_kernel(K=K, verbose=False)
-    fig1, fig2 = visualize_weights(W, J, Psi, k_pres=[6], K=K, dpi=400, colored=False)
+    fig1, fig2 = visualize_weights(W, J, Psi, k_pre=6, K=K, dpi=400, colored=False)
 
     output_path1 = "tests/figures/W.png"
     plt.savefig(output_path1)
@@ -51,7 +51,7 @@ def test_compute_WJ():
 def test_compute_WJPsi():
     K = 12
     J, W, Psi = compute_connection_kernel(K=K, verbose=False)
-    fig = visualize_weights(W, J, Psi, k_pres=[6], K=K, dpi=400, colored=True)
+    fig = visualize_weights(W, J, Psi, k_pre=6, K=K, dpi=400, colored=True)
 
     output_path = "tests/figures/JWPsi.png"
     plt.savefig(output_path)
