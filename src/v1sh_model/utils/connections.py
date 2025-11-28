@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 
@@ -118,7 +119,7 @@ def compute_angle_between_bar_and_line(bar_angle, line_angle):
     return angle_diff
 
 
-def compute_connection_kernel(K=12, verbose=False) -> np.ndarray:
+def compute_connection_kernel(K=12, verbose=False, use_original=True) -> np.ndarray:
     """Computes intracortical connection kernels J, W and Psi, according to pp. 314, "Understanding Vision" (Li Zhaoping, 2014).
         Note: 3. dimension is post-synaptic, 4. dimension is pre-synaptic orientation channel
 
@@ -222,11 +223,20 @@ def compute_connection_kernel(K=12, verbose=False) -> np.ndarray:
                             d, beta, delta_theta, theta_1, theta_2
                         )
 
+    if use_original:
+        module_dir = os.path.dirname(os.path.abspath(__file__))
+        filepath = os.path.join(module_dir, "..", "..", "..", "trash")
+        J = np.load(os.path.join(filepath, "J_original.npy"))
+        W = np.load(os.path.join(filepath, "W_original.npy"))
+        print("Use loaded original connections.")
+    else:
+        print("Use computed connections.")
+
     return J, W, Psi
 
 
 def visualize_weights(
-    W, J, Psi, k_pre=6, K=12, dpi=300, verbose=False, colored=True
+    W, J, Psi=None, k_pre=6, K=12, dpi=300, verbose=False, colored=True, center_idx = (10, 10),
 ):
     N_y, N_x = W.shape[0], W.shape[1]
     A = np.linspace(0, np.pi, K, endpoint=False)
@@ -256,20 +266,23 @@ def visualize_weights(
             axis=axis,
         )
 
-        green_line = mlines.Line2D([], [], color="tab:green", label=r"$\psi$")
-        Psi_broadcasted = np.zeros_like(W)
-        Psi_broadcasted[W.shape[0] // 2, W.shape[1] // 2, :, :] = Psi[0, 0, :, :]
-        plot_bars(
-            A,
-            Psi_broadcasted[:, :, :, k_pre],
-            verbose=False,
-            dpi=dpi,
-            color="tab:green",
-            axis=axis,
-        )
+        if Psi is not None:
+            green_line = mlines.Line2D([], [], color="tab:green", label=r"$\psi$")
+            Psi_broadcasted = np.zeros_like(W)
+            Psi_broadcasted[W.shape[0] // 2, W.shape[1] // 2, :, :] = Psi[0, 0, :, :]
+            plot_bars(
+                A,
+                Psi_broadcasted[:, :, :, k_pre],
+                verbose=False,
+                dpi=dpi,
+                color="tab:green",
+                axis=axis,
+            )
+        else:
+            green_line = None
 
         center_bar = np.zeros((N_y, N_x, K))
-        center_bar[10, 10, k_pre] = 1
+        center_bar[center_idx[0], center_idx[1], k_pre] = 1
         black_line = mlines.Line2D([], [], color="k", label="presynaptic neuron")
         plot_bars(A, center_bar, verbose=False, dpi=dpi, color="k", axis=axis)
 
@@ -284,7 +297,7 @@ def visualize_weights(
         return fig
     else:  # replicate fig. 4 from A Neural Model of Contour Integration, Zhaoping Li, 1998
         center_bar = np.zeros((N_y, N_x, K))
-        center_bar[10, 10, k_pre] = 4
+        center_bar[center_idx[0], center_idx[1], k_pre] = 4
 
         fig_1, axis = plt.subplots(
             figsize=(12, 5), constrained_layout=True, dpi=dpi

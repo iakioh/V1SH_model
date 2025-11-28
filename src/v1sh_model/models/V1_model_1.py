@@ -44,7 +44,9 @@ class V1_model_1:
         self.I_c = I_c
         self.g_x = g_x
         self.g_y = g_y
-
+        
+        assert np.all(self.Psi.swapaxes(2,3) == self.Psi), "Psi is assumed to be symmetric for initial condition"
+       
         # Noise parameters
         assert average_noise_height >= 0, "average_noise_height must be non-negative"
         assert average_noise_temporal_width > 0, (
@@ -218,10 +220,12 @@ class V1_model_1:
             )  # last dim: 0: noise for X, 1: noise for Y
             noise_duration = np.zeros((N_y, N_x, K, 2))
 
-            # initial state = random
             I_noise, noise_duration = self.update_noise(I_noise, noise_duration)
-            X[0] += I_noise[..., 0] * dt
-            Y[0] += I_noise[..., 1] * dt
+
+        # Initial condition
+        Y[0] = self.I_c() / self.alpha_y
+        X[0] = (self.I_o() - self.g_y(Y[0, 0, 0]) * (1 + self.Psi[0, 0, 0, :].sum())) / self.alpha_x # all Y[0] values are the same and assert symmetric Psi here during sum
+
 
         # Time integration using Euler method
         update_steps = int(0.05 / dt)

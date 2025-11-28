@@ -15,5 +15,5 @@ def tuning_curve(angle: np.ndarray) -> np.ndarray:
         absolute_angle, np.pi - absolute_angle
     )  # wrap to [0, pi/2]
     phi = np.exp(-absolute_angle / (np.pi / 8))
-    phi[absolute_angle >= np.pi / 6] = 0
+    phi[absolute_angle >= np.pi / 6 - 1e-2] = 0
     return phi

@@ -152,6 +152,7 @@ class V1_model_2:
         assert kernel_size % 2 == 1, "Kernel size must be odd"
         assert (self.W.shape[0] == self.W.shape[1]), "Kernels must be square"
         assert (self.J.shape[0] == self.W.shape[0]) and (self.J.shape[1] == self.W.shape[1]), "J and W must have the same shape"
+        assert np.all(self.Psi.swapaxes(2,3) == self.Psi), "Psi is assumed to be symmetric for initial condition"
         self.J_o = J_o
         self.W_o = W_o
 
@@ -169,7 +170,7 @@ class V1_model_2:
             "average_noise_temporal_width must be positive"
         )
         self.noise_std = average_noise_height
-        self.noise_tau = average_noise_temporal_width
+        self.noise_tau = average_noise_temporal_width # TODO: scale by alpha!
         self.rng = np.random.default_rng(seed)
 
     def get_input(
@@ -210,30 +211,32 @@ class V1_model_2:
         return I
 
     def update_noise(
-        self, I_noise: np.ndarray, noise_duration: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray]:
+        self, I_noise: np.ndarray, noise_start: np.ndarray, noise_end: np.ndarray, time:  float
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Defines noise distributions and updates the noise input I_noise based on the remaining noise duration
 
         Parameters:
             I_noise (np.ndarray): Current noise input, shape (N_y, N_x, K)
-            noise_duration (np.ndarray): Remaining duration of current noise input, same shape as I_noise
-
+            noise_start (np.ndarray): Start times of current noise inputs, same shape as I_noise
+            noise_end (np.ndarray): End times of current noise inputs, same shape as I_noise
+            time (float): Current simulation time (be careful: time = steps t * step_size dt)
+            
         Returns:
             I_noise (np.ndarray): Updated noise input, same shape as input
-            noise_duration (np.ndarray): Updated remaining duration of current noise input, same shape as I _noise
+            noise_start (np.ndarray): Updated start times of current noise inputs, same shape as input
+            noise_end (np.ndarray): Updated end times of current noise inputs, same shape as input
         """
 
-        # amplitude follows normal distribution
-        I_noise[noise_duration <= 0] = self.rng.normal(
-            0., self.noise_std, size=I_noise.shape
-        )[noise_duration <= 0]
+        update_mask = time >= noise_end
+        I_noise[update_mask] = self.rng.uniform(
+            - self.noise_std / 2, + self.noise_std / 2, size=I_noise.shape
+        )[update_mask]
 
-        # temporal width follows exponential distribution,
-        noise_duration[noise_duration <= 0] = self.rng.exponential(
-            self.noise_tau, size=noise_duration.shape
-        )[noise_duration <= 0]
+        noise_start[update_mask] = time
+        noise_end[update_mask] = time + self.rng.uniform(0, 2 * self.noise_tau, size=I_noise.shape
+        )[update_mask]
 
-        return I_noise, noise_duration
+        return I_noise, noise_start, noise_end
 
     def derivative(
         self,
@@ -321,25 +324,26 @@ class V1_model_2:
 
         # Interneuon state over time
         Y = np.zeros((steps, N_y, N_x, K), dtype=np.float64)
-        
+
+        # Noise initialization
+        if noisy:
+            I_noise = np.zeros(
+                (N_y, N_x, K, 2), dtype=np.float64
+            )  # last dim: 0 = noise for X, 1 = noise for Y
+            noise_start = np.zeros((N_y, N_x, K, 2), dtype=np.float64)
+            noise_end = np.zeros((N_y, N_x, K, 2), dtype=np.float64)
+
+            I_noise, noise_start, noise_end = self.update_noise(I_noise, noise_start, noise_end, 0.0)
+
         if initial_condition is not None:
             X_0, Y_0 = initial_condition
             assert X_0.shape == (N_y, N_x, K), "Initial condition X_0 has incorrect shape"
             assert Y_0.shape == (N_y, N_x, K), "Initial condition Y_0 has incorrect shape"
             X[0] = X_0
             Y[0] = Y_0
-
-        # Noise initialization
-        if noisy:
-            I_noise = np.zeros(
-                (N_y, N_x, K, 2), dtype=np.float64
-            )  # last dim: 0: noise for X, 1: noise for Y
-            noise_duration = np.zeros((N_y, N_x, K, 2), dtype=np.float64)
-
-            # initial state = random
-            I_noise, noise_duration = self.update_noise(I_noise, noise_duration)
-            X[0] += I_noise[..., 0] * dt
-            Y[0] += I_noise[..., 1] * dt
+        else:
+            Y[0] = self.I_c() / self.alpha_y
+            X[0] = (self.I_o() - self.g_y(Y[0, 0, 0]) * (1 + self.Psi[0, 0, 0, :].sum())) / self.alpha_x # all Y[0] values are the same and assert symmetric Psi here during sum
 
         # Time integration using Euler method
         update_steps = int(0.05 / dt)
@@ -351,10 +355,9 @@ class V1_model_2:
 
                 if noisy:
                     # add noise
-                    noise_duration -= dt
-                    I_noise, noise_duration = self.update_noise(I_noise, noise_duration)
-                    X[t] += I_noise[..., 0] * dt
-                    Y[t] += I_noise[..., 1] * dt
+                    I_noise, noise_start, noise_end = self.update_noise(I_noise, noise_start, noise_end, t * dt)
+                    X[t] += I_noise[..., 0] * (t * dt - noise_start[..., 0]) # integrate noise linearly over its duration
+                    Y[t] += I_noise[..., 1] * (t * dt - noise_start[..., 1]) # integrate noise linearly over its duration
 
                 # Update progress bar every 0.05 seconds of simulated time
                 if (t >= 1) and ((t - 1) % update_steps == 0):
