@@ -119,7 +119,7 @@ def compute_angle_between_bar_and_line(bar_angle, line_angle):
     return angle_diff
 
 
-def compute_connection_kernel(K=12, verbose=False, use_original=True) -> np.ndarray:
+def compute_connection_kernel(K=12, verbose=False, use_original=False) -> np.ndarray:
     """Computes intracortical connection kernels J, W and Psi, according to pp. 314, "Understanding Vision" (Li Zhaoping, 2014).
         Note: 3. dimension is post-synaptic, 4. dimension is pre-synaptic orientation channel
 

@@ -16,11 +16,11 @@ from v1sh_model.inputs.examples import (
 )
 
 if __name__ == "__main__":
-    model = V1_model()
+    model = V1_model(average_noise_height = 0.1, average_noise_temporal_width = 0.1, seed = 42)
     g_x = model.g_x
 
     T = 12.0
-    dt = 0.001
+    dt = 0.01
     N_y_test, N_x_test = 9 + 2 * 10, 9 + 2 * 10
 
     test_cases = {
@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
         # simulate model
         X, _, _ = model.simulate(
-            A_in, C_in, dt=dt, T=T, verbose=False, noisy=True, mode="wrap"
+            A_in, C_in, dt=dt, T=T, verbose=False, noisy=False, mode="wrap"
         )
         model_output = g_x(X).mean(axis=0)  # N_y x N_x x K
         C_out = model_output.max(axis=-1)  # N_y x N_x
@@ -82,6 +82,6 @@ if __name__ == "__main__":
     #         input_and_outputs[key] = result
 
     # save results
-    output_path = "data/calibration_results.npz"
+    output_path = "data/calibration_results_trash.npz"
     np.savez_compressed(output_path, **input_and_outputs)
     print(f"Calibration results saved to {output_path}")
