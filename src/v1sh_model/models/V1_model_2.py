@@ -346,7 +346,7 @@ class V1_model_2:
             X[0] = (self.I_o() - self.g_y(Y[0, 0, 0]) * (1 + self.Psi[0, 0, 0, :].sum())) / self.alpha_x # all Y[0] values are the same and assert symmetric Psi here during sum
 
         # Time integration using Euler method
-        update_steps = int(0.05 / dt)
+        update_steps = int(0.5 / dt)
         with tqdm(total=steps, desc="Simulating", unit="step") as pbar:
             for t in range(1, steps):
                 dXdt, dYdt = self.derivative(X[t - 1], Y[t - 1], I, mode=mode)
