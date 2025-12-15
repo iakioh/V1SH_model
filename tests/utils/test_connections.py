@@ -51,11 +51,19 @@ def test_compute_WJ():
 def test_compute_WJPsi():
     K = 12
     J, W, Psi = compute_connection_kernel(K=K, verbose=False)
-    fig = visualize_weights(W, J, Psi, k_pre=6, K=K, dpi=400, colored=True)
+    fig_1 = visualize_weights(W, J, Psi, k_pre=6, K=K, dpi=400, colored=True)
 
     output_path = "tests/figures/JWPsi.png"
     plt.savefig(output_path)
     plt.close()
 
     assert os.path.exists(output_path), f"Plot was not saved to {output_path}"
+    
+    fig_2 = visualize_weights(W, J, Psi=None, k_pre=6, K=K, dpi=400, colored=True, coloring="red-green")
+    output_path = "tests/figures/JWPsi_2.png"
+    plt.savefig(output_path)
+    plt.close()
+
+    assert os.path.exists(output_path), f"Plot was not saved to {output_path}"
+    
 

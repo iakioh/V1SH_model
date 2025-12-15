@@ -236,7 +236,7 @@ def compute_connection_kernel(K=12, verbose=False, use_original=False) -> np.nda
 
 
 def visualize_weights(
-    W, J, Psi=None, k_pre=6, K=12, dpi=300, verbose=False, colored=True, center_idx = (10, 10),
+    W, J, Psi=None, k_pre=6, K=12, dpi=300, verbose=False, colored=True, center_idx = (10, 10), coloring = "red-blue-green"
 ):
     N_y, N_x = W.shape[0], W.shape[1]
     A = np.linspace(0, np.pi, K, endpoint=False)
@@ -246,14 +246,14 @@ def visualize_weights(
     plt.rcParams.update({"font.size": 10})
     if colored:
         fig, axis = plt.subplots(figsize=(12, 5), constrained_layout=True, dpi=dpi)
-        blue_line = mlines.Line2D([], [], color="tab:blue", label=r"$J$")
+        green_line = mlines.Line2D([], [], color="tab:green", label=r"$J$")
         plot_bars(
             A,
             J[:, :, :, k_pre] * 7.5,
             verbose=False,
             dpi=dpi,
             axis=axis,
-            color="tab:blue",
+            color="tab:green",
         )
 
         red_line = mlines.Line2D([], [], color="tab:red", label=r"$W$")
@@ -267,7 +267,10 @@ def visualize_weights(
         )
 
         if Psi is not None:
-            green_line = mlines.Line2D([], [], color="tab:green", label=r"$\psi$")
+            if coloring == "red-blue-green":
+                blue_line = mlines.Line2D([], [], color="tab:blue", label=r"$\psi$")
+            else:
+                blue_line = mlines.Line2D([], [], color="tab:green", label=r"$\psi$")
             Psi_broadcasted = np.zeros_like(W)
             Psi_broadcasted[W.shape[0] // 2, W.shape[1] // 2, :, :] = Psi[0, 0, :, :]
             plot_bars(
@@ -275,22 +278,23 @@ def visualize_weights(
                 Psi_broadcasted[:, :, :, k_pre],
                 verbose=False,
                 dpi=dpi,
-                color="tab:green",
+                color="tab:blue" if coloring == "red-blue-green" else "tab:green",
                 axis=axis,
             )
         else:
-            green_line = None
+            blue_line = None
 
         center_bar = np.zeros((N_y, N_x, K))
         center_bar[center_idx[0], center_idx[1], k_pre] = 1
         black_line = mlines.Line2D([], [], color="k", label="presynaptic neuron")
         plot_bars(A, center_bar, verbose=False, dpi=dpi, color="k", axis=axis)
 
-        plt.legend(
-            handles=[blue_line, red_line, green_line, black_line],
-            loc="upper right",
-            framealpha=1.0,
-        )
+        if coloring == "red-blue-green":
+            plt.legend(
+                handles=[green_line, red_line, blue_line, black_line],
+                loc="upper right",
+                framealpha=1.0,
+            )
 
         plt.tight_layout()
 
@@ -330,3 +334,4 @@ def visualize_weights(
         plt.tight_layout()
 
         return fig_1, fig_2
+
