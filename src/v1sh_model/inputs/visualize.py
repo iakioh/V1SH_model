@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import Optional
+from typing import Optional, Dict
 
 
 def plot_bars(
@@ -30,6 +30,7 @@ def plot_bars(
         fig (matplotlib.figure.Figure): The matplotlib figure object
     """
     assert W.shape == A.shape, "W must have the same shape as A"
+    assert W.ndim in (2, 3), "W must be 2D or 3D array"
     if A.ndim == 2:
         A = A[:, :, np.newaxis]
         W = W[:, :, np.newaxis]
@@ -73,6 +74,92 @@ def plot_bars(
                     linewidth=W[i, j, k],
                     solid_capstyle="butt",
                 )
+
+    if verbose and fig is not None:
+        plt.show()
+
+    return fig
+
+
+def plot_bars_colored(
+    A: np.ndarray,
+    W: np.ndarray,
+    color_map: np.ndarray,
+    l: float = 9,
+    r: float = 1.3,
+    verbose: bool = True,
+    dpi: int = 500,
+    axis: Optional[plt.Axes] = None,
+    color_dict: Dict[int, str] = {0: "black", 1: "red", 2: "green", 3: "blue"},
+    plot_priority: Optional[np.ndarray] = None,
+) -> plt.Figure:
+    """
+    Plots a Manhatten grid of bars with given angles A and widths W.
+
+    Parameters:
+        A (np.ndarray): array of angles (radians), shape (N_y, N_x, K) or (N_y, N_x). 1. and 2. dimension = indicate y- and x-coordinate of bar. Last dimension allows plotting multiple bars at the same location.
+        W (np.ndarray or None): array of bar widths, same shape as A
+        l (float): Bar length
+        r (float): Grid spacing factor
+        verbose (bool): If True, show the plot
+        dpi (int): Dots per inch for rendering
+        axis (matplotlib axis or None): If provided, plot on this axis instead of creating a new figure.
+        plot_priority (np.ndarray or None): If provided, bars are plotted in the order of decreasing values in this array. I.e. lower values are plotted first. Shape must match color_map.
+
+    Returns:
+        fig (matplotlib.figure.Figure): The matplotlib figure object
+    """
+    assert W.shape == A.shape, "W must have the same shape as A"
+    if A.ndim == 2:
+        A = A[:, :, np.newaxis]
+        W = W[:, :, np.newaxis]
+        color_map = color_map[:, :, np.newaxis]
+    N_y, N_x, K = A.shape
+
+    # Calculate image size in pixels
+    d = l * r  # grid spacing
+    img_height = int(N_y * d)
+    img_width = int(N_x * d)
+
+    # Create figure
+    if axis is not None:
+        ax = axis
+        fig = None
+    else:
+        fig, ax = plt.subplots(figsize=(img_width / 100, img_height / 100), dpi=dpi)
+    ax.set_xlim(0, img_width)
+    ax.set_ylim(0, img_height)
+    ax.set_aspect("equal")  # keep x and y scales the same, avoding distortion
+    ax.axis("off")
+    
+    if plot_priority is None:
+        plot_priority = np.zeros_like(color_map)
+    coordinate_list = np.argsort(plot_priority.flatten())
+
+    # Draw non-colored bars
+    for index in coordinate_list:
+        i, j, k = np.unravel_index(index, color_map.shape)
+        # compute center of the bar
+        cx = (j + 0.5) * d  # center x-coordinate
+        cy = (i + 0.5) * d  # invert y-axis for plotting
+        # compute bar directions
+        angle = A[i, j, k]
+        dx = l * np.sin(angle) / 2
+        dy = l * np.cos(angle) / 2
+        # compute endpoints of the bar
+        x0, y0 = cx - dx, cy - dy
+        x1, y1 = cx + dx, cy + dy
+        if color_map[i, j, k] not in color_dict:
+            print(f"Warning: color_map value {color_map[i, j, k]} not in color_dict keys {list(color_dict.keys())}. Using black as default color.")
+            continue
+        # draw the bar
+        ax.plot(
+            [x0, x1],
+            [y0, y1],
+            color=color_dict[color_map[i, j, k]],
+            linewidth=W[i, j, k],
+            solid_capstyle="butt",
+        )
 
     if verbose and fig is not None:
         plt.show()

@@ -5,7 +5,7 @@ from typing import Optional
 from v1sh_model.utils.activations import g_x
 
 
-def I_o(X: Optional[np.ndarray] = None) -> np.ndarray:
+def I_o(X: Optional[np.ndarray] = None, original_parametrization: bool = True) -> np.ndarray:
     """Computes normalization term of pyramidal cells
 
     Parameters:
@@ -19,14 +19,17 @@ def I_o(X: Optional[np.ndarray] = None) -> np.ndarray:
         g_X_summed_over_K = g_X.sum(axis=-1, keepdims=True)  # shape (N_y, N_x, 1)
 
         # neighbors on Manhatten Grid with distance maximal 2
+        # neuron itself is included in neighborhood
         neighbors = np.ones((5, 5), dtype=g_X.dtype)
-        # neighbors[2, 2] = 0  # neuron itself is included in neighborhood
 
         g_X_normalized = convolve(
             g_X_summed_over_K, neighbors[:, :, np.newaxis], mode="wrap"
         )  # shape (N_y, N_x, 1)
         
-        return 0.85 - 2.0 * (g_X_normalized / 16) ** 2
+        if original_parametrization:
+            return 0.85 - 2.0 * (g_X_normalized / 16) ** 2 # normalization actually implemented as "16" instead of "25"
+        else:
+            return 0.8 - 2.0 * (g_X_normalized / neighbors.sum()) ** 2 # as documented in original paper
     else:
         return 0.85
 

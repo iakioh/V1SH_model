@@ -3,7 +3,7 @@
 import numpy as np
 import concurrent.futures
 
-from v1sh_model.models.V1_model_2 import V1_model_2 as V1_model
+from v1sh_model.models.V1_model import V1_model
 from v1sh_model.inputs.examples import (
     bar_without_surround,
     iso_orientation,
@@ -51,6 +51,8 @@ if __name__ == "__main__":
 
         input_and_outputs[title] = (A_in, C_in, A_out, C_out)
 
+    ###### to parallelize the above loop instead, uncomment below: ######
+    
     # def run_test_case(args):
     #     # create input images
     #     title, N_y_test, N_x_test, dt, T = args
@@ -80,8 +82,10 @@ if __name__ == "__main__":
     #     for future in concurrent.futures.as_completed(futures):
     #         key, result = future.result()
     #         input_and_outputs[key] = result
+    
+    ###### end of parallelized version ######
 
     # save results
-    output_path = "data/calibration_results_trash.npz"
+    output_path = "data/results/calibration_results.npz"
     np.savez_compressed(output_path, **input_and_outputs)
     print(f"Calibration results saved to {output_path}")

@@ -102,7 +102,7 @@ def summation_numba(
 
     return dXdt, dYdt
 
-class V1_model_2:
+class V1_model:
     def __init__(
         self,
         K : int = 12,
@@ -130,9 +130,13 @@ class V1_model_2:
             g_y (Callable): Activation function for interneurons, default g_y
             I_o (Callable): Normalization function for pyramidal cells, default I_o
             I_c (Callable): Normalization function for interneurons, default I_c
-            average_noise_height (float): Standard deviation of noise amplitude, default 0.1
+            average_noise_height (float): Standard deviation of noise amplitude, default 0.1. 
             average_noise_temporal_width (float): Average temporal width of noise, default 0.1
             seed (int or None): Random seed for noise generation, default None
+        
+        Note: I use different noise distributions that the original implementation, which should not make am qualitative difference. 
+        But the default noise parameters might therefore be too high, tweak them to assure well-calibrated noise levels.
+        
         """
         # Tuning curve function
         self.tuning_curve = tuning_curve
@@ -211,32 +215,30 @@ class V1_model_2:
         return I
 
     def update_noise(
-        self, I_noise: np.ndarray, noise_start: np.ndarray, noise_end: np.ndarray, time:  float
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        self, I_noise: np.ndarray, noise_duration: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Defines noise distributions and updates the noise input I_noise based on the remaining noise duration
 
         Parameters:
             I_noise (np.ndarray): Current noise input, shape (N_y, N_x, K)
-            noise_start (np.ndarray): Start times of current noise inputs, same shape as I_noise
-            noise_end (np.ndarray): End times of current noise inputs, same shape as I_noise
-            time (float): Current simulation time (be careful: time = steps t * step_size dt)
-            
+            noise_duration (np.ndarray): Remaining duration of current noise input, same shape as I_noise
+
         Returns:
             I_noise (np.ndarray): Updated noise input, same shape as input
-            noise_start (np.ndarray): Updated start times of current noise inputs, same shape as input
-            noise_end (np.ndarray): Updated end times of current noise inputs, same shape as input
+            noise_duration (np.ndarray): Updated remaining duration of current noise input, same shape as I _noise
         """
 
-        update_mask = time >= noise_end
-        I_noise[update_mask] = self.rng.uniform(
-            - self.noise_std / 2, + self.noise_std / 2, size=I_noise.shape
-        )[update_mask]
+        # amplitude follows normal distribution
+        I_noise[noise_duration <= 0] = self.rng.normal(
+            0, self.noise_std, size=I_noise.shape
+        )[noise_duration <= 0]
 
-        noise_start[update_mask] = time
-        noise_end[update_mask] = time + self.rng.uniform(0, 2 * self.noise_tau, size=I_noise.shape
-        )[update_mask]
+        # temporal width follows exponential distribution,
+        noise_duration[noise_duration <= 0] = self.rng.exponential(
+            self.noise_tau, size=noise_duration.shape
+        )[noise_duration <= 0]
 
-        return I_noise, noise_start, noise_end
+        return I_noise, noise_duration
 
     def derivative(
         self,
@@ -300,7 +302,7 @@ class V1_model_2:
         noisy: bool = True,
         mode: str = "wrap",
         initial_condition: Optional[tuple[np.ndarray, np.ndarray]] = None,
-    ) -> np.ndarray:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Simulates the model over time given input I
 
         Parameters:
@@ -309,6 +311,7 @@ class V1_model_2:
             T (float): Total simulation time
             noisy (bool): If True, add noise to the simulation; default True
             mode (str): boundary condition of simulation (see np.pad); default "wrap"
+            initial_condition (Optional[tuple[np.ndarray, np.ndarray]]): Initial condition for (X, Y); default steady state with no input
 
         Returns:
             X (np.ndarray): Final pyramidal state after simulation, shape (T, N_y, N_x, K)
@@ -328,19 +331,15 @@ class V1_model_2:
         # Noise initialization
         if noisy:
             I_noise = np.zeros(
-                (N_y, N_x, K, 2), dtype=np.float64
-            )  # last dim: 0 = noise for X, 1 = noise for Y
-            noise_start = np.zeros((N_y, N_x, K, 2), dtype=np.float64)
-            noise_end = np.zeros((N_y, N_x, K, 2), dtype=np.float64)
+                (N_y, N_x, K, 2)
+            )  # last dim: 0: noise for X, 1: noise for Y
+            noise_duration = np.zeros((N_y, N_x, K, 2))
 
-            I_noise, noise_start, noise_end = self.update_noise(I_noise, noise_start, noise_end, 0.0)
+            I_noise, noise_duration = self.update_noise(I_noise, noise_duration)
 
+        # Initial condition: steady state with no input
         if initial_condition is not None:
-            X_0, Y_0 = initial_condition
-            assert X_0.shape == (N_y, N_x, K), "Initial condition X_0 has incorrect shape"
-            assert Y_0.shape == (N_y, N_x, K), "Initial condition Y_0 has incorrect shape"
-            X[0] = X_0
-            Y[0] = Y_0
+            X[0], Y[0] = initial_condition
         else:
             Y[0] = self.I_c() / self.alpha_y
             X[0] = (self.I_o() - self.g_y(Y[0, 0, 0]) * (1 + self.Psi[0, 0, 0, :].sum())) / self.alpha_x # all Y[0] values are the same and assert symmetric Psi here during sum
@@ -355,16 +354,18 @@ class V1_model_2:
 
                 if noisy:
                     # add noise
-                    I_noise, noise_start, noise_end = self.update_noise(I_noise, noise_start, noise_end, t * dt)
-                    X[t] += I_noise[..., 0] * (t * dt - noise_start[..., 0]) # integrate noise linearly over its duration
-                    Y[t] += I_noise[..., 1] * (t * dt - noise_start[..., 1]) # integrate noise linearly over its duration
+                    noise_duration -= dt
+                    I_noise, noise_duration = self.update_noise(I_noise, noise_duration)
+                    X[t] += I_noise[..., 0] * dt
+                    Y[t] += I_noise[..., 1] * dt
 
                 # Update progress bar every 0.05 seconds of simulated time
                 if (t >= 1) and ((t - 1) % update_steps == 0):
                     pbar.update(update_steps)
 
         return X, Y
-
+    
+    
     def simulate(
         self,
         A: np.ndarray,
@@ -386,11 +387,68 @@ class V1_model_2:
             verbose (bool): If True, visualize input; default False
             noisy (bool): If True, add noise to the simulation; default True
             mode (str): boundary condition of simulation (see np.pad); default "wrap"
-            initial_condition (tuple[np.ndarray, np.ndarray] or None): Initial condition for (X, Y); default None
+            initial_condition (Optional[tuple[np.ndarray, np.ndarray]]): Initial condition for (X, Y); default steady state with no input
             
         Returns:
             X (np.ndarray): Final state after simulation, shape (T, N_y, N_x, K)
         """
         I = self.get_input(A, C, verbose=verbose)
-        X, Y = self.euler_method(I, dt, T, noisy=noisy, mode=mode, initial_condition = initial_condition)
+        X, Y = self.euler_method(I, dt, T, noisy=noisy, mode=mode, initial_condition=initial_condition)
         return X, Y, I
+
+
+    def saliency_map(self, X: np.ndarray) -> np.ndarray:
+        """Computes the saliency map from the pyramidal cell state X
+
+        Parameters:
+            X (np.ndarray): Pyramidal cell state, shape (T, N_y, N_x, K) or (N_y, N_x, K)
+        
+        Returns:
+            S (np.ndarray): Saliency map, shape (N_y, N_x)
+            A_out (np.ndarray): Output angles (radians), shape (N_y, N_x)
+        """
+        # output activation
+        X_activated = self.g_x(X)
+        
+        # temporal average over pyramidal activations
+        if X_activated.ndim == 4:
+            X_activated = np.mean(X_activated, axis=0)
+        
+        # Maximum over orientation channels (at each location)
+        smap = X_activated.max(axis=-1)
+        A_out = X_activated.argmax(axis=-1) * (np.pi / self.K)
+        
+        return smap, A_out
+        
+    
+    def get_output(
+        self,
+        A: np.ndarray,
+        C: np.ndarray,
+        dt: float = 0.001,
+        T: float = 12.0,
+        noisy: bool = True
+    ) -> np.ndarray:
+        """Runs the full simulation given angles A and contrasts C and returns the saliency map and angles
+
+        Parameters:
+            A (np.ndarray): 2D array of angles (radians) of input bars, shape (N_y, N_x), values in [0, pi]
+            C (np.ndarray): 2D array of contrasts of input bars, same shape as A, values in [1, 4] or 0 (no bar)
+            dt (float): Time step
+            T (float): Total simulation time
+            noisy (bool): If True, add noise to the simulation; default True
+            
+        Returns:
+            S (np.ndarray): Saliency map, shape (N_y, N_x)
+            A_out (np.ndarray): Output angles (radians), shape (N_y, N_x)
+            
+        """
+        X, Y, I = self.simulate(
+            A,
+            C,
+            dt=dt,
+            T=T,
+            noisy=noisy
+        )
+        S, A_out = self.saliency_map(X)
+        return S, A_out

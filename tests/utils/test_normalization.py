@@ -18,7 +18,7 @@ def test_I_o_1(verbose=False):
     X = np.zeros((9, 9, 12))
     X[0, 0, 0] = 2.0
 
-    analytical_result = 0.85 - 2 * (1 / 25) ** 2
+    analytical_result = 0.85 - 2 * (1 / 16) ** 2
     I_o_result = I_o(X)
     assert I_o_result[0, 0, 0] == analytical_result, (
         f"Analytical value: {analytical_result} <-> Code: {I_o_result[0, 0, 0]}"
@@ -47,7 +47,7 @@ def test_I_o_2(verbose=False):
     X[4, 4, 5] = 2
     X[4, 4, 6] = 2
 
-    analytical_result = 0.85 - 2 * (3 / 25) ** 2
+    analytical_result = 0.85 - 2 * (3 / 16) ** 2
     I_o_result = I_o(X)
     assert I_o_result[2, 2, 0] == analytical_result, (
         f"Analytical value: {analytical_result} <-> Code: {I_o_result[2, 2, 0]}"

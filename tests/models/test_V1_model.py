@@ -1,12 +1,12 @@
 import numpy as np
 
 from v1sh_model.inputs.examples import neighboring_textures
-from v1sh_model.models.V1_model_1 import V1_model_1
+from v1sh_model.models.V1_model import V1_model
 
 
 def test_V1_model():
     seed = 42
-    model = V1_model_1(seed=seed, alpha_x=1.0, alpha_y=1.0)
+    model = V1_model(seed=seed, alpha_x=1.0, alpha_y=1.0)
     A, C = neighboring_textures(22, 60, 2.0)
 
     T = 2.0
@@ -21,7 +21,7 @@ def test_V1_model():
 
 
 def test_1(N_y=20, N_x=20, K=12, seed=None):
-    model = V1_model_1(seed=seed, alpha_x=1.0, alpha_y=1.0)
+    model = V1_model(seed=seed, alpha_x=1.0, alpha_y=1.0)
 
     X, Y = np.zeros((N_y, N_x, K)), np.zeros((N_y, N_x, K))
     rng = np.random.default_rng(seed)
@@ -37,7 +37,7 @@ def test_1(N_y=20, N_x=20, K=12, seed=None):
 
 
 def test_2(N_y=40, N_x=40, K=12, seed=None):
-    model = V1_model_1(seed=seed, alpha_x=1.0, alpha_y=1.0)
+    model = V1_model(seed=seed, alpha_x=1.0, alpha_y=1.0)
     model.J = np.zeros_like(model.J)
     model.W = np.zeros_like(model.W)
     model.Psi = np.zeros_like(model.Psi)
@@ -56,7 +56,7 @@ def test_2(N_y=40, N_x=40, K=12, seed=None):
 
 
 def test_3(N_y=40, N_x=40, K=12, seed=None):
-    model = V1_model_1(seed=seed, alpha_x=1.0, alpha_y=1.0)
+    model = V1_model(seed=seed, alpha_x=1.0, alpha_y=1.0)
     model.J = np.zeros_like(model.J)
     model.W = np.zeros_like(model.W)
     model.Psi = np.zeros_like(model.Psi)
@@ -79,7 +79,7 @@ def test_3(N_y=40, N_x=40, K=12, seed=None):
 
 
 def test_4(N_y=40, N_x=40, K=12, seed=None):
-    model = V1_model_1(seed=seed, alpha_x=1.0, alpha_y=1.0)
+    model = V1_model(seed=seed, alpha_x=1.0, alpha_y=1.0)
     kernel_size = 5
     rng = np.random.default_rng(seed)
     model.J = np.ones((kernel_size, kernel_size, K, K)) * 0.1

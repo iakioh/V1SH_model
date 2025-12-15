@@ -1,9 +1,7 @@
 import numpy as np 
-import matplotlib.pyplot as plt
-import pandas as pd
 import os
 
-from v1sh_model.models.V1_model_2 import V1_model_2 as V1_model
+from v1sh_model.models.V1_model import V1_model
 
 def stimulus(N_row = None, N_col = None, N_x = 4, N_y = 2, I_input = 1.5, orientation = 0.0):
     if N_row is None:

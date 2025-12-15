@@ -4,6 +4,8 @@ from v1sh_model.inputs.visualize import visualize_input, visualize_output
 from v1sh_model.utils.tuning_curve import tuning_curve
 
 class NaiveModel:
+    """ A simple naive model for purpose of debugging the numerical simulation. """
+    
     def __init__(self, K=12, alpha=1.0):
         self.alpha = alpha
         self.K = K
